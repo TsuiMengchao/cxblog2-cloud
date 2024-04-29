@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="me.mcx.blog.mapper.BlogArticleMapper">
+    
+    <resultMap type="BlogArticle" id="BlogArticleResult">
+        <result property="id"    column="id"    />
+        <result property="userId"    column="user_id"    />
+        <result property="categoryId"    column="category_id"    />
+        <result property="title"    column="title"    />
+        <result property="avatar"    column="avatar"    />
+        <result property="summary"    column="summary"    />
+        <result property="content"    column="content"    />
+        <result property="contentMd"    column="content_md"    />
+        <result property="readType"    column="read_type"    />
+        <result property="isStick"    column="is_stick"    />
+        <result property="isPublish"    column="is_publish"    />
+        <result property="isOriginal"    column="is_original"    />
+        <result property="originalUrl"    column="original_url"    />
+        <result property="quantity"    column="quantity"    />
+        <result property="isCarousel"    column="is_carousel"    />
+        <result property="isRecommend"    column="is_recommend"    />
+        <result property="keywords"    column="keywords"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="remark"    column="remark"    />
+    </resultMap>
+
+    <sql id="selectBlogArticleVo">
+        select id, user_id, category_id, title, avatar, summary, content, content_md, read_type, is_stick, is_publish, is_original, original_url, quantity, is_carousel, is_recommend, keywords, create_by, create_time, update_by, update_time, remark from blog_article
+    </sql>
+
+    <select id="selectBlogArticleList" parameterType="BlogArticle" resultMap="BlogArticleResult">
+        <include refid="selectBlogArticleVo"/>
+        <where>  
+            <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
+            <if test="categoryId != null "> and category_id = #{categoryId}</if>
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="avatar != null  and avatar != ''"> and avatar = #{avatar}</if>
+            <if test="summary != null  and summary != ''"> and summary = #{summary}</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="contentMd != null  and contentMd != ''"> and content_md = #{contentMd}</if>
+            <if test="readType != null "> and read_type = #{readType}</if>
+            <if test="isStick != null "> and is_stick = #{isStick}</if>
+            <if test="isPublish != null "> and is_publish = #{isPublish}</if>
+            <if test="isOriginal != null "> and is_original = #{isOriginal}</if>
+            <if test="originalUrl != null  and originalUrl != ''"> and original_url = #{originalUrl}</if>
+            <if test="quantity != null "> and quantity = #{quantity}</if>
+            <if test="isCarousel != null "> and is_carousel = #{isCarousel}</if>
+            <if test="isRecommend != null "> and is_recommend = #{isRecommend}</if>
+            <if test="keywords != null  and keywords != ''"> and keywords = #{keywords}</if>
+        </where>
+    </select>
+    
+    <select id="selectBlogArticleById" parameterType="Long" resultMap="BlogArticleResult">
+        <include refid="selectBlogArticleVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertBlogArticle" parameterType="BlogArticle" useGeneratedKeys="true" keyProperty="id">
+        insert into blog_article
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="userId != null">user_id,</if>
+            <if test="categoryId != null">category_id,</if>
+            <if test="title != null and title != ''">title,</if>
+            <if test="avatar != null">avatar,</if>
+            <if test="summary != null and summary != ''">summary,</if>
+            <if test="content != null">content,</if>
+            <if test="contentMd != null">content_md,</if>
+            <if test="readType != null">read_type,</if>
+            <if test="isStick != null">is_stick,</if>
+            <if test="isPublish != null">is_publish,</if>
+            <if test="isOriginal != null">is_original,</if>
+            <if test="originalUrl != null">original_url,</if>
+            <if test="quantity != null">quantity,</if>
+            <if test="isCarousel != null">is_carousel,</if>
+            <if test="isRecommend != null">is_recommend,</if>
+            <if test="keywords != null">keywords,</if>
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="remark != null">remark,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="userId != null">#{userId},</if>
+            <if test="categoryId != null">#{categoryId},</if>
+            <if test="title != null and title != ''">#{title},</if>
+            <if test="avatar != null">#{avatar},</if>
+            <if test="summary != null and summary != ''">#{summary},</if>
+            <if test="content != null">#{content},</if>
+            <if test="contentMd != null">#{contentMd},</if>
+            <if test="readType != null">#{readType},</if>
+            <if test="isStick != null">#{isStick},</if>
+            <if test="isPublish != null">#{isPublish},</if>
+            <if test="isOriginal != null">#{isOriginal},</if>
+            <if test="originalUrl != null">#{originalUrl},</if>
+            <if test="quantity != null">#{quantity},</if>
+            <if test="isCarousel != null">#{isCarousel},</if>
+            <if test="isRecommend != null">#{isRecommend},</if>
+            <if test="keywords != null">#{keywords},</if>
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="remark != null">#{remark},</if>
+         </trim>
+    </insert>
+
+    <update id="updateBlogArticle" parameterType="BlogArticle">
+        update blog_article
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="title != null and title != ''">title = #{title},</if>
+            <if test="avatar != null">avatar = #{avatar},</if>
+            <if test="summary != null and summary != ''">summary = #{summary},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="contentMd != null">content_md = #{contentMd},</if>
+            <if test="readType != null">read_type = #{readType},</if>
+            <if test="isStick != null">is_stick = #{isStick},</if>
+            <if test="isPublish != null">is_publish = #{isPublish},</if>
+            <if test="isOriginal != null">is_original = #{isOriginal},</if>
+            <if test="originalUrl != null">original_url = #{originalUrl},</if>
+            <if test="quantity != null">quantity = #{quantity},</if>
+            <if test="isCarousel != null">is_carousel = #{isCarousel},</if>
+            <if test="isRecommend != null">is_recommend = #{isRecommend},</if>
+            <if test="keywords != null">keywords = #{keywords},</if>
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="remark != null">remark = #{remark},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteBlogArticleById" parameterType="Long">
+        delete from blog_article where id = #{id}
+    </delete>
+
+    <delete id="deleteBlogArticleByIds" parameterType="String">
+        delete from blog_article where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <select id="selectCount" parameterType="BlogArticle" resultType="Integer">
+        SELECT COUNT(*) AS count FROM blog_article
+        <where>
+            <if test="userId != null  and userId != ''"> and user_id = #{userId}</if>
+            <if test="categoryId != null "> and category_id = #{categoryId}</if>
+            <if test="title != null  and title != ''"> and title = #{title}</if>
+            <if test="avatar != null  and avatar != ''"> and avatar = #{avatar}</if>
+            <if test="summary != null  and summary != ''"> and summary = #{summary}</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="contentMd != null  and contentMd != ''"> and content_md = #{contentMd}</if>
+            <if test="readType != null "> and read_type = #{readType}</if>
+            <if test="isStick != null "> and is_stick = #{isStick}</if>
+            <if test="isPublish != null "> and is_publish = #{isPublish}</if>
+            <if test="isOriginal != null "> and is_original = #{isOriginal}</if>
+            <if test="originalUrl != null  and originalUrl != ''"> and original_url = #{originalUrl}</if>
+            <if test="quantity != null "> and quantity = #{quantity}</if>
+            <if test="isCarousel != null "> and is_carousel = #{isCarousel}</if>
+            <if test="isRecommend != null "> and is_recommend = #{isRecommend}</if>
+            <if test="keywords != null  and keywords != ''"> and keywords = #{keywords}</if>
+        </where>
+    </select>
+</mapper>

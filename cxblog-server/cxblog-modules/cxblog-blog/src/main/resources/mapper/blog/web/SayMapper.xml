@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="me.mcx.blog.mapper.web.SayMapper">
+
+    <select id="selectPublicSayList" resultType="me.mcx.blog.domain.vo.say.ApiSayVO">
+        select s.*,u.nick_name as nickname,u.avatar from blog_say s
+            left join `cxblog-cloud`.sys_user u on s.user_id = u.user_id
+        <if test="!showPrivate">
+            where s.is_public = 1
+        </if>
+        order by s.create_time desc
+    </select>
+</mapper>
