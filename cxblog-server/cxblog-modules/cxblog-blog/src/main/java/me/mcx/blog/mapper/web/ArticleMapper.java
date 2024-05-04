@@ -18,10 +18,9 @@ public interface ArticleMapper {
 
     /**
      * 后台分页获取文章
-     * @param page 分页对象
      * @return
      */
-    Page<SystemArticleListVO> selectArticle(@Param("page") Page<Object> page, @Param("title")String title, @Param("tagId")Integer tagId,
+    List<SystemArticleListVO> selectArticle(@Param("title")String title, @Param("tagId")Integer tagId,
                                             @Param("categoryId")Integer categoryId, @Param("isPublish")Integer isPublish);
 
     /**

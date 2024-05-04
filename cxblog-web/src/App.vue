@@ -63,8 +63,8 @@ function handleReport() {
 function initWebSiteInfo() {
   getWebSiteInfo().then((res) => {
     siteStore.setWebInfo(res.data);
-    siteStore.setSiteAccess(res.extra.siteAccess);
-    siteStore.setVsitorAccess(res.extra.visitorAccess);
+    siteStore.setSiteAccess(res.siteAccess);
+    siteStore.setVsitorAccess(res.visitorAccess);
   });
 }
 

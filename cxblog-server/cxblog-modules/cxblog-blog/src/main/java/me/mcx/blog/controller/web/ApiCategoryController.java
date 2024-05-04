@@ -3,6 +3,7 @@ package me.mcx.blog.controller.web;
 import me.mcx.blog.service.web.ApiCategoryService;
 import me.mcx.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +23,7 @@ public class ApiCategoryController {
      * 分类列表
      * @return
      */
-    @RequestMapping(value = "/",method = RequestMethod.GET)
+    @GetMapping
     public AjaxResult selectCategoryList(){
         return categoryService.selectCategoryList();
     }

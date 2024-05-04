@@ -24,17 +24,15 @@ import me.mcx.blog.mapper.BlogFollowedMapper;
 import me.mcx.blog.mapper.web.ArticleMapper;
 import me.mcx.blog.mapper.web.TagsMapper;
 import me.mcx.blog.service.web.ApiArticleService;
-import me.mcx.blog.service.web.RedisService;
-import me.mcx.blog.service.web.SystemConfigService;
+import me.mcx.blog.service.common.RedisService;
+import me.mcx.blog.service.common.SystemConfigService;
 import me.mcx.blog.strategy.context.SearchStrategyContext;
 import me.mcx.blog.util.BeanCopyUtil;
-import me.mcx.common.core.context.SecurityContextHolder;
+import me.mcx.common.security.utils.SecurityUtils;
 import me.mcx.common.core.exception.ServiceException;
-import me.mcx.common.core.utils.PageUtils;
 import me.mcx.common.core.utils.ip.IpUtils;
 import me.mcx.common.core.web.domain.AjaxResult;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -120,7 +118,7 @@ public class ApiArticleServiceImpl implements ApiArticleService {
             apiArticleInfoVO.setLikeCount(map.get(id.toString()));
         }
         //获取当前登录用户是否点赞该文章
-        Object userId = SecurityContextHolder.getLoginIdDefaultNull();
+        Object userId = SecurityUtils.getLoginIdDefaultNull();
         if (userId != null){
             String articleLikeKey = ARTICLE_USER_LIKE + userId;
             if (redisService.sIsMember(articleLikeKey, id)) {
@@ -209,7 +207,7 @@ public class ApiArticleServiceImpl implements ApiArticleService {
      */
     @Override
     public AjaxResult articleLike(Integer articleId) {
-        String userId = SecurityContextHolder.getLoginIdAsString();
+        String userId = SecurityUtils.getLoginIdAsString();
         // 判断是否点赞
         String articleLikeKey = ARTICLE_USER_LIKE + userId;
         if (redisService.sIsMember(articleLikeKey, articleId)) {
@@ -242,7 +240,7 @@ public class ApiArticleServiceImpl implements ApiArticleService {
     @Transactional(rollbackFor = Exception.class)
     public AjaxResult insertArticle(ArticlePostDTO dto) {
         BlogArticle article = BeanCopyUtil.copyObject(dto, BlogArticle.class);
-        article.setUserId(SecurityContextHolder.getLoginIdAsString());
+        article.setUserId(SecurityUtils.getLoginIdAsString());
         int insert = blogArticleMapper.insertBlogArticle(article);
         //添加标签
         if (insert > 0){
@@ -250,7 +248,7 @@ public class ApiArticleServiceImpl implements ApiArticleService {
         }
         ThreadUtil.execAsync(() ->{
             // 发送系统通知
-            SystemNoticeHandle.sendNotice(SecurityContextHolder.getLoginIdAsString(),MessageConstant.MESSAGE_SYSTEM_NOTICE, MessageConstant.SYSTEM_MESSAGE_CODE,
+            SystemNoticeHandle.sendNotice(SecurityUtils.getLoginIdAsString(),MessageConstant.MESSAGE_SYSTEM_NOTICE, MessageConstant.SYSTEM_MESSAGE_CODE,
                     null,null,"恭喜您发布了一篇文章");
         });
         return AjaxResult.success();
@@ -260,7 +258,7 @@ public class ApiArticleServiceImpl implements ApiArticleService {
     @Transactional(rollbackFor = Exception.class)
     public AjaxResult updateMyArticle(ArticlePostDTO dto) {
         BlogArticle article = BeanCopyUtil.copyObject(dto, BlogArticle.class);
-        if (!article.getUserId().equals(SecurityContextHolder.getLoginIdAsString())) {
+        if (!article.getUserId().equals(SecurityUtils.getLoginIdAsString())) {
             throw new ServiceException("只能修改自己的文章！");
         }
         blogArticleMapper.updateBlogArticle(article);
@@ -298,8 +296,8 @@ public class ApiArticleServiceImpl implements ApiArticleService {
     }
 
     @Override
-    public AjaxResult selectArticleByUserId(String userId, Integer type) {
-        userId = StringUtils.isNotBlank(userId) ? userId : SecurityContextHolder.getLoginIdAsString();
+    public List<ApiArticleListVO> selectArticleByUserId(String userId, Integer type) {
+        userId = StringUtils.isNotBlank(userId) ? userId : SecurityUtils.getLoginIdAsString();
         List<ApiArticleListVO> list = articleMapper.selectMyArticle(userId,type);
         list.forEach(item ->{
             List<BlogTags> tags = tagsMapper.selectTagByArticleId(item.getId());
@@ -307,7 +305,7 @@ public class ApiArticleServiceImpl implements ApiArticleService {
 
             item.setFormatCreateTime(RelativeDateFormat.format(item.getCreateTime()));
         });
-        return AjaxResult.success(list);
+        return list;
 
     }
 
@@ -320,7 +318,7 @@ public class ApiArticleServiceImpl implements ApiArticleService {
     @Transactional(rollbackFor = Exception.class)
     public AjaxResult deleteMyArticle(Long id) {
         BlogArticle article = blogArticleMapper.selectBlogArticleById(id);
-        if (!article.getUserId().equals(SecurityContextHolder.getLoginIdAsString())) {
+        if (!article.getUserId().equals(SecurityUtils.getLoginIdAsString())) {
             throw new ServiceException("只能删除自己的文章！");
         }
         blogArticleMapper.deleteBlogArticleById(id);
@@ -336,7 +334,7 @@ public class ApiArticleServiceImpl implements ApiArticleService {
     @Override
     public AjaxResult selectMyArticleInfo(Long id) {
         ArticlePostDTO articlePostDTO =  articleMapper.selectMyArticleInfo(id);
-        if (!articlePostDTO.getUserId().equals(SecurityContextHolder.getLoginIdAsString())) {
+        if (!articlePostDTO.getUserId().equals(SecurityUtils.getLoginIdAsString())) {
             throw new ServiceException("只能查看自己的文章！");
         }
         List<BlogTags> tags = tagsMapper.selectTagByArticleId(id);

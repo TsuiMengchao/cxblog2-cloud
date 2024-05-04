@@ -6,10 +6,7 @@ import lombok.RequiredArgsConstructor;
 import me.mcx.blog.domain.BlogMessage;
 import me.mcx.blog.service.web.ApiMessageService;
 import me.mcx.common.core.web.domain.AjaxResult;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -31,7 +28,7 @@ public class ApiMessageController {
      * 留言列表
      * @return
      */
-    @RequestMapping(value = "/",method = RequestMethod.GET)
+    @GetMapping
     public AjaxResult selectMessageList(){
         return messageService.selectMessageList();
     }
@@ -42,7 +39,7 @@ public class ApiMessageController {
      * @param message
      * @return
      */
-    @RequestMapping(value = "/",method = RequestMethod.POST)
+    @PostMapping
     public AjaxResult addMessage(@RequestBody BlogMessage message){
         return messageService.addMessage(message);
     }

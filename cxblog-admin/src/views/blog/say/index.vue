@@ -1,29 +1,15 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="用户id" prop="userId">
-        <el-input
-          v-model="queryParams.userId"
-          placeholder="请输入用户id"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="发表地址。可输入或者地图插件选择" prop="address">
-        <el-input
-          v-model="queryParams.address"
-          placeholder="请输入发表地址。可输入或者地图插件选择"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="是否开放查看  0未开放 1开放" prop="isPublic">
-        <el-input
-          v-model="queryParams.isPublic"
-          placeholder="请输入是否开放查看  0未开放 1开放"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+      <el-form-item label="是否开放查看" prop="isPublic">
+        <el-select v-model="queryParams.isPublic" placeholder="请选择是否开放查看" clearable>
+          <el-option
+            v-for="dict in blog_say_public"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -76,11 +62,23 @@
     <el-table v-loading="loading" :data="sayList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="主键id" align="center" prop="id" />
-      <el-table-column label="用户id" align="center" prop="userId" />
-      <el-table-column label="图片地址 逗号分隔  最多九张" align="center" prop="imgUrl" />
+      <el-table-column label="图片地址" align="center" prop="imgUrl" width="100">
+        <template #default="scope">
+          <image-preview :src="scope.row.imgUrl" :width="50" :height="50"/>
+        </template>
+      </el-table-column>
       <el-table-column label="内容" align="center" prop="content" />
-      <el-table-column label="发表地址。可输入或者地图插件选择" align="center" prop="address" />
-      <el-table-column label="是否开放查看  0未开放 1开放" align="center" prop="isPublic" />
+      <el-table-column label="发表地址" align="center" prop="address" />
+      <el-table-column label="是否开放查看" align="center" prop="isPublic">
+        <template #default="scope">
+          <dict-tag :options="blog_say_public" :value="scope.row.isPublic"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+        <template #default="scope">
+          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
@@ -101,20 +99,20 @@
     <!-- 添加或修改说说对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
       <el-form ref="sayRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="用户id" prop="userId">
-          <el-input v-model="form.userId" placeholder="请输入用户id" />
-        </el-form-item>
-        <el-form-item label="图片地址 逗号分隔  最多九张" prop="imgUrl">
-          <el-input v-model="form.imgUrl" type="textarea" placeholder="请输入内容" />
+        <el-form-item label="图片地址" prop="imgUrl">
+          <image-upload v-model="form.imgUrl"/>
         </el-form-item>
         <el-form-item label="内容">
           <editor v-model="form.content" :min-height="192"/>
         </el-form-item>
-        <el-form-item label="发表地址。可输入或者地图插件选择" prop="address">
-          <el-input v-model="form.address" placeholder="请输入发表地址。可输入或者地图插件选择" />
-        </el-form-item>
-        <el-form-item label="是否开放查看  0未开放 1开放" prop="isPublic">
-          <el-input v-model="form.isPublic" placeholder="请输入是否开放查看  0未开放 1开放" />
+        <el-form-item label="是否开放查看" prop="isPublic">
+          <el-radio-group v-model="form.isPublic">
+            <el-radio
+              v-for="dict in blog_say_public"
+              :key="dict.value"
+              :label="parseInt(dict.value)"
+            >{{dict.label}}</el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -134,6 +132,7 @@
 import { listSay, getSay, delSay, addSay, updateSay } from "@/api/blog/say";
 
 const { proxy } = getCurrentInstance();
+const { blog_say_public } = proxy.useDict('blog_say_public');
 
 const sayList = ref([]);
 const open = ref(false);
@@ -150,11 +149,8 @@ const data = reactive({
   queryParams: {
     pageNum: 1,
     pageSize: 10,
-    userId: null,
-    imgUrl: null,
-    content: null,
-    address: null,
     isPublic: null,
+    remark: null
   },
   rules: {
     userId: [

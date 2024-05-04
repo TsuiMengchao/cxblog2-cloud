@@ -1,6 +1,8 @@
 package me.mcx.blog.mapper;
 
 import java.util.List;
+
+import me.mcx.blog.domain.BlogArticleComment;
 import me.mcx.blog.domain.BlogImMessage;
 
 /**
@@ -58,4 +60,6 @@ public interface BlogImMessageMapper
      * @return 结果
      */
     public int deleteBlogImMessageByIds(String[] ids);
+
+    Integer selectBlogImMessageCount(BlogImMessage blogImMessage);
 }

@@ -9,22 +9,6 @@
           @keyup.enter="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="${comment}" prop="clickVolume">
-        <el-input
-          v-model="queryParams.clickVolume"
-          placeholder="请输入${comment}"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="排序" prop="sort">
-        <el-input
-          v-model="queryParams.sort"
-          placeholder="请输入排序"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
         <el-button icon="Refresh" @click="resetQuery">重置</el-button>
@@ -77,7 +61,7 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="主键id" align="center" prop="id" />
       <el-table-column label="标签名称" align="center" prop="name" />
-      <el-table-column label="${comment}" align="center" prop="clickVolume" />
+      <el-table-column label="点击量" align="center" prop="clickVolume" />
       <el-table-column label="排序" align="center" prop="sort" />
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -101,9 +85,6 @@
       <el-form ref="tagsRef" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="标签名称" prop="name">
           <el-input v-model="form.name" placeholder="请输入标签名称" />
-        </el-form-item>
-        <el-form-item label="${comment}" prop="clickVolume">
-          <el-input v-model="form.clickVolume" placeholder="请输入${comment}" />
         </el-form-item>
         <el-form-item label="排序" prop="sort">
           <el-input v-model="form.sort" placeholder="请输入排序" />
@@ -143,8 +124,7 @@ const data = reactive({
     pageNum: 1,
     pageSize: 10,
     name: null,
-    clickVolume: null,
-    sort: null,
+    remark: null
   },
   rules: {
     name: [

@@ -1,5 +1,6 @@
 package me.mcx.blog.service.web.impl;
 
+import cn.hutool.core.thread.ThreadUtil;
 import cn.hutool.http.useragent.UserAgent;
 import cn.hutool.http.useragent.UserAgentParser;
 import lombok.RequiredArgsConstructor;
@@ -10,13 +11,15 @@ import me.mcx.blog.domain.BlogUserInfo;
 import me.mcx.blog.domain.vo.article.ApiArticleListVO;
 import me.mcx.blog.domain.vo.message.ApiCommentListVO;
 import me.mcx.blog.handle.RelativeDateFormat;
+import me.mcx.blog.handle.SystemNoticeHandle;
+import me.mcx.blog.im.MessageConstant;
 import me.mcx.blog.mapper.BlogArticleCommentMapper;
 import me.mcx.blog.mapper.BlogArticleMapper;
 import me.mcx.blog.mapper.web.ArticleCommentMapper;
 import me.mcx.blog.mapper.web.UserInfoMapper;
 import me.mcx.blog.service.web.ApiCommentService;
 import me.mcx.blog.util.HTMLUtil;
-import me.mcx.common.core.context.SecurityContextHolder;
+import me.mcx.common.security.utils.SecurityUtils;
 import me.mcx.common.core.exception.ServiceException;
 import me.mcx.common.core.utils.ServletUtils;
 import me.mcx.common.core.utils.ip.IpUtils;
@@ -64,7 +67,7 @@ public class ApiCommentServiceImpl implements ApiCommentService {
         comment.setContent(content);
         comment.setSystemVersion(os);
         comment.setIpAddress(ipAddress);
-        comment.setUserId(SecurityContextHolder.getLoginIdAsString());
+        comment.setUserId(SecurityUtils.getLoginIdAsString());
         int insert = blogArticleCommentMapper.insertBlogArticleComment(comment);
         if (insert == 0){
             throw new ServiceException("评论失败");
@@ -76,9 +79,9 @@ public class ApiCommentServiceImpl implements ApiCommentService {
             toUserId =  article.getUserId();
         }
         String finalUserId = toUserId;
-//        ThreadUtil.execAsync(() -> {
-//            SystemNoticeHandle.sendNotice(finalUserId, MessageConstant.MESSAGE_COMMENT_NOTICE, MessageConstant.SYSTEM_MESSAGE_CODE, comment.getArticleId(), mark, comment.getContent());
-//        });
+        ThreadUtil.execAsync(() -> {
+            SystemNoticeHandle.sendNotice(finalUserId, MessageConstant.MESSAGE_COMMENT_NOTICE, MessageConstant.SYSTEM_MESSAGE_CODE, Math.toIntExact(comment.getArticleId()), mark, comment.getContent());
+        });
         return AjaxResult.success(comment);
     }
 
@@ -123,7 +126,7 @@ public class ApiCommentServiceImpl implements ApiCommentService {
      */
     @Override
     public List<ApiArticleListVO> selectMyComment() {
-        List<ApiArticleListVO> result  = commentMapper.selectMyComment(SecurityContextHolder.getLoginIdAsString());
+        List<ApiArticleListVO> result  = commentMapper.selectMyComment(SecurityUtils.getLoginIdAsString());
         return result;
     }
 }

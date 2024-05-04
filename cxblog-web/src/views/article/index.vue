@@ -27,8 +27,8 @@
         <div class="left-item hand-style" title="收藏" @click="doCollect">
           <el-badge :value="article.collectCount" class="item">
             <span style="font-size: 20px">
-              <el-icon v-if="article.isCollect"><Star /></el-icon>
-              <el-icon v-else><StarFilled /></el-icon>
+              <el-icon v-if="article.isCollect"><StarFilled /></el-icon>
+              <el-icon v-else><Star /></el-icon>
             </span>
           </el-badge>
         </div>
@@ -735,13 +735,13 @@ function doCollect() {
     cancelCollect(id).then((res) => {
       article.value.collectCount--;
       article.value.isCollect = 0;
-      proxy.$modal.msgSuccess("收藏成功");
+      proxy.$modal.msg("取消收藏成功");
     });
   } else {
     collect(id).then((res) => {
       article.value.collectCount++;
       article.value.isCollect = 1;
-      proxy.$modal.msg("取消收藏成功");
+      proxy.$modal.msgSuccess("收藏成功");
     });
   }
 }

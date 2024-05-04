@@ -403,9 +403,9 @@ const feedbackFormRef = ref();
 function getCount() {
   getUserCount().then((res) => {
     let obj = {
-      article: res.extra.articleCount,
-      collect: res.extra.collectCount,
-      followed: res.extra.followedCount,
+      article: res.articleCount,
+      collect: res.collectCount,
+      followed: res.followedCount,
     };
     count.value = obj;
   });

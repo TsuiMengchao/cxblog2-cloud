@@ -25,17 +25,35 @@
             <result property="name" column="cname" jdbcType="VARCHAR"></result>
         </association>
     </resultMap>
+
+    <resultMap id="selectArticleToVOMap" type="me.mcx.blog.domain.vo.article.SystemArticleListVO">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_Id" jdbcType="VARCHAR" property="userId"/>
+        <result column="nickname" jdbcType="VARCHAR" property="nickname"/>
+        <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="is_original" jdbcType="INTEGER" property="isOriginal"/>
+        <result column="is_publish" jdbcType="INTEGER" property="isPublish"/>
+        <result column="quantity" jdbcType="INTEGER" property="quantity"/>
+        <result column="create_time" jdbcType="DATE" property="createTime"/>
+        <result column="read_type" jdbcType="INTEGER" property="readType"/>
+        <result property="categoryName" column="name" jdbcType="VARCHAR"/>
+        <result property="nickname" column="nick_name" jdbcType="VARCHAR"/>
+        <result property="isStick" column="is_stick" jdbcType="VARCHAR"/>
+    </resultMap>
     
-    <select id="selectArticle" resultType="me.mcx.blog.domain.vo.article.SystemArticleListVO">
+    <select id="selectArticle" resultMap="selectArticleToVOMap">
         SELECT
         a.*,
-        b.NAME AS categoryName,
+        b.name,
+        u.nick_name,
         group_concat( t.NAME SEPARATOR ',' ) AS tagNames
         FROM
         blog_article a
         JOIN blog_category b ON a.category_id = b.id
         JOIN blog_article_tag atg ON a.id = atg.article_id
         JOIN blog_tags t ON atg.tag_id = t.id
+        JOIN `cxblog-cloud`.sys_user u ON a.user_id=u.user_id
         <where>
             <if test="title != null and title != ''">
                 a.title like concat('%',#{title},'%')
@@ -60,17 +78,17 @@
                a.summary,
                a.quantity,
                a.content,
-               a.content_md,
-               a.read_type,
-               a.is_stick,
-               a.is_publish,
-               a.is_original,
-               a.original_url,
-               a.create_time,
+               a.content_md as contentMd,
+               a.read_type as readType,
+               a.is_stick as isStick,
+               a.is_publish as isPublish,
+               a.is_original as isOriginal,
+               a.original_url as originalUrl,
+               a.create_time as createTime,
                b.name as categoryName,
-               a.is_carousel,
+               a.is_carousel as isCarousel,
                a.keywords,
-               a.is_recommend
+               a.is_recommend as isRecommend
         from blog_article a
                  LEFT JOIN (SELECT id, name from blog_category) b on a.category_id = b.id
         where a.id = #{id}

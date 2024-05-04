@@ -6,10 +6,7 @@ import lombok.RequiredArgsConstructor;
 import me.mcx.blog.domain.BlogFriendLink;
 import me.mcx.blog.service.web.ApiFriendLinkService;
 import me.mcx.common.core.web.domain.AjaxResult;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * <p>
@@ -31,7 +28,7 @@ public class ApiFriendLinkController {
      * 友链列表
      * @return
      */
-    @RequestMapping(value = "/",method = RequestMethod.GET)
+    @GetMapping
     public AjaxResult selectFriendLinkList(){
         return friendLinkService.selectFriendLinkList();
     }
@@ -41,7 +38,7 @@ public class ApiFriendLinkController {
      * @param friendLink
      * @return
      */
-    @RequestMapping(value = "/",method = RequestMethod.POST)
+    @PostMapping
     public AjaxResult addFriendLink(@RequestBody BlogFriendLink friendLink){
         return friendLinkService.addFriendLink(friendLink);
     }

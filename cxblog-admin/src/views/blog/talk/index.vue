@@ -9,13 +9,15 @@
           @keyup.enter="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="话题图标" prop="icon">
-        <el-input
-          v-model="queryParams.icon"
-          placeholder="请输入话题图标"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+      <el-form-item label="状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
+          <el-option
+            v-for="dict in blog_talk_status"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -69,8 +71,21 @@
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="id" align="center" prop="id" />
       <el-table-column label="话题名" align="center" prop="name" />
-      <el-table-column label="话题图标" align="center" prop="icon" />
-      <el-table-column label="状态 0：正常  1：禁用" align="center" prop="status" />
+      <el-table-column label="话题图标" align="center" prop="icon" width="100">
+        <template #default="scope">
+          <image-preview :src="scope.row.icon" :width="50" :height="50"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="状态" align="center" prop="status">
+        <template #default="scope">
+          <dict-tag :options="blog_talk_status" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+        <template #default="scope">
+          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
@@ -79,7 +94,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -88,14 +103,23 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改话题圈子对话框 -->
+    <!-- 添加或修改话题对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
       <el-form ref="talkRef" :model="form" :rules="rules" label-width="80px">
         <el-form-item label="话题名" prop="name">
           <el-input v-model="form.name" placeholder="请输入话题名" />
         </el-form-item>
         <el-form-item label="话题图标" prop="icon">
-          <el-input v-model="form.icon" placeholder="请输入话题图标" />
+          <image-upload v-model="form.icon"/>
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-radio-group v-model="form.status">
+            <el-radio
+              v-for="dict in blog_talk_status"
+              :key="dict.value"
+              :label="parseInt(dict.value)"
+            >{{dict.label}}</el-radio>
+          </el-radio-group>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -115,6 +139,7 @@
 import { listTalk, getTalk, delTalk, addTalk, updateTalk } from "@/api/blog/talk";
 
 const { proxy } = getCurrentInstance();
+const { blog_talk_status } = proxy.useDict('blog_talk_status');
 
 const talkList = ref([]);
 const open = ref(false);
@@ -132,8 +157,8 @@ const data = reactive({
     pageNum: 1,
     pageSize: 10,
     name: null,
-    icon: null,
     status: null,
+    remark: null
   },
   rules: {
     name: [
@@ -144,7 +169,7 @@ const data = reactive({
 
 const { queryParams, form, rules } = toRefs(data);
 
-/** 查询话题圈子列表 */
+/** 查询话题列表 */
 function getList() {
   loading.value = true;
   listTalk(queryParams.value).then(response => {
@@ -199,7 +224,7 @@ function handleSelectionChange(selection) {
 function handleAdd() {
   reset();
   open.value = true;
-  title.value = "添加话题圈子";
+  title.value = "添加话题";
 }
 
 /** 修改按钮操作 */
@@ -209,7 +234,7 @@ function handleUpdate(row) {
   getTalk(_id).then(response => {
     form.value = response.data;
     open.value = true;
-    title.value = "修改话题圈子";
+    title.value = "修改话题";
   });
 }
 
@@ -237,7 +262,7 @@ function submitForm() {
 /** 删除按钮操作 */
 function handleDelete(row) {
   const _ids = row.id || ids.value;
-  proxy.$modal.confirm('是否确认删除话题圈子编号为"' + _ids + '"的数据项？').then(function() {
+  proxy.$modal.confirm('是否确认删除话题编号为"' + _ids + '"的数据项？').then(function() {
     return delTalk(_ids);
   }).then(() => {
     getList();

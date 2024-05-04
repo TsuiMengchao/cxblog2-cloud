@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function listArticle(params) {
     return request({
-        url: '/api/v1/article/',
+        url: '/api/v1/article',
         method: 'get',
         params: params
     })
@@ -16,7 +16,7 @@ export function getArticleByUserId(params) {
 }
 export function deleteMyArticle(id) {
     return request({
-        url: '/api/v1/article/',
+        url: '/api/v1/article',
         method: 'delete',
         params: {
             id: id
@@ -41,14 +41,14 @@ export function readMarkdownFile(data) {
 }
 export function insertArticle(data) {
     return request({
-        url: '/api/v1/article/',
+        url: '/api/v1/article',
         method: 'post',
         data
     })
 }
 export function updateArticle(data) {
     return request({
-        url: '/api/v1/article/',
+        url: '/api/v1/article',
         method: 'put',
         data
     })
@@ -95,7 +95,7 @@ export function archiveArticle() {
 
 export function listTagAll() {
     return request({
-        url: '/api/v1/tag/',
+        url: '/api/v1/tag',
         method: 'get',
 
     })
@@ -103,7 +103,7 @@ export function listTagAll() {
 
 export function featchHomeData() {
     return request({
-        url: '/api/v1/',
+        url: '/api/v1',
         method: 'get',
     })
 }
@@ -145,8 +145,8 @@ export function forgetPassword(data) {
 }
 export function logout() {
     return request({
-        url: '/logout',
-        method: 'get'
+        url: '/auth/logout',
+        method: 'delete'
     })
 }
 export function openAuthUrl(source) {
@@ -189,7 +189,7 @@ export function emailRegister(data) {
 }
 export function updateUserInfo(data) {
     return request({
-        url: '/api/v1/user/',
+        url: '/api/v1/user',
         method: 'put',
         data
     })
@@ -231,21 +231,21 @@ export function upload(data) {
 }
 export function listCategory() {
     return request({
-        url: '/api/v1/category/',
+        url: '/api/v1/category',
         method: 'get'
     })
 }
 
 export function addFeedback(data) {
     return request({
-        url: '/api/v1/feedback/',
+        url: '/api/v1/feedback',
         method: 'post',
         data
     })
 }
 export function getCollect() {
     return request({
-        url: '/api/v1/collect/',
+        url: '/api/v1/collect',
         method: 'get'
     })
 }
@@ -260,7 +260,7 @@ export function collect(id) {
 }
 export function cancelCollect(id) {
     return request({
-        url: '/api/v1/collect/',
+        url: '/api/v1/collect',
         method: 'delete',
         params: {
             articleId: id

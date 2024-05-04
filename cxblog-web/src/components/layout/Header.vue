@@ -200,7 +200,7 @@
         <el-dropdown trigger="hover">
               <span class="el-dropdown-link">
                   <button type="button" class="sendBtn">
-                      <i class="el-icon-edit-outline"></i> 创作
+                      <el-icon :size="20"><Edit /></el-icon> 创作
                   </button>
               </span>
           <template #dropdown>
@@ -697,7 +697,7 @@ function openDrawer() {
 
       .searchBox {
         position: absolute;
-        right: 300px;
+        right: 260px;
         top: 0;
         display: flex;
         -ms-flex-direction: column;
@@ -739,11 +739,16 @@ function openDrawer() {
 
       .articleBtn {
         position: absolute;
-        right: 300px;
+        right: 150px;
         top: 0;
+        ::v-deep(.el-dropdown) {
+          right: 0;
+          top: 14px;
+        }
 
         .sendBtn {
-          display: inline-block;
+          align-items: center;
+          display: flex;
           background: linear-gradient(135deg, #60e464 10%, #5cb85b 100%);
           border-radius: 50px;
           padding: 5px 10px 5px 10px;
@@ -754,7 +759,7 @@ function openDrawer() {
 
       .noticeBtn {
         position: absolute;
-        right: 250px;
+        right: 110px;
         top: 0;
         ::v-deep(.el-dropdown) {
           right: 0;
@@ -773,7 +778,7 @@ function openDrawer() {
 
       .userInfo {
         position: absolute;
-        right: 190px;
+        right: 50px;
         top: 0;
 
         ::v-deep(.el-dropdown) {

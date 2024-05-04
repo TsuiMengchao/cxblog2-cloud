@@ -82,6 +82,10 @@ public class BlogArticle extends BaseEntity
     @Excel(name = "关键词")
     private String keywords;
 
+    /** 发布地址 */
+    @Excel(name = "发布地址")
+    private String address;
+
     public void setId(Long id) 
     {
         this.id = id;
@@ -236,6 +240,16 @@ public class BlogArticle extends BaseEntity
         return keywords;
     }
 
+    public void setAddress(String address)
+    {
+        this.address = address;
+    }
+
+    public String getAddress()
+    {
+        return address;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
@@ -256,6 +270,7 @@ public class BlogArticle extends BaseEntity
             .append("isCarousel", getIsCarousel())
             .append("isRecommend", getIsRecommend())
             .append("keywords", getKeywords())
+                .append("address", getAddress())
             .append("createBy", getCreateBy())
             .append("createTime", getCreateTime())
             .append("updateBy", getUpdateBy())

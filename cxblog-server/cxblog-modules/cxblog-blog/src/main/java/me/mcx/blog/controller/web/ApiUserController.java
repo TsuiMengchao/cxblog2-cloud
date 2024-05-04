@@ -1,14 +1,10 @@
 package me.mcx.blog.controller.web;
 
 import lombok.RequiredArgsConstructor;
-import me.mcx.blog.annotation.SaCheckLogin;
 import me.mcx.blog.domain.dto.user.UserInfoDTO;
 import me.mcx.blog.service.web.ApiUserService;
 import me.mcx.common.core.web.domain.AjaxResult;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/v1/user")
 @RestController
@@ -22,7 +18,6 @@ public class ApiUserController {
      * @param userId
      * @return
      */
-    @SaCheckLogin
     @RequestMapping(value = "/info",method = RequestMethod.GET)
     public AjaxResult selectUserInfo(String userId){
         return userService.selectUserInfo(userId);
@@ -33,8 +28,7 @@ public class ApiUserController {
      * @param vo
      * @return
      */
-    @SaCheckLogin
-    @RequestMapping(value = "/",method = RequestMethod.PUT)
+    @GetMapping
     public AjaxResult updateUser(@RequestBody UserInfoDTO vo){
         return userService.updateUser(vo);
     }

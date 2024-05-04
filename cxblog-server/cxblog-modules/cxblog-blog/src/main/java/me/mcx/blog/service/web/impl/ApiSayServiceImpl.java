@@ -1,6 +1,5 @@
 package me.mcx.blog.service.web.impl;
 
-import lombok.RequiredArgsConstructor;
 import me.mcx.blog.common.RedisConstants;
 import me.mcx.blog.common.ResultCode;
 import me.mcx.blog.domain.BlogSay;
@@ -14,12 +13,11 @@ import me.mcx.blog.mapper.BlogSayMapper;
 import me.mcx.blog.mapper.web.SayMapper;
 import me.mcx.blog.mapper.web.UserMapper;
 import me.mcx.blog.service.web.ApiSayService;
-import me.mcx.blog.service.web.RedisService;
-import me.mcx.common.core.context.SecurityContextHolder;
+import me.mcx.blog.service.common.RedisService;
+import me.mcx.common.security.utils.SecurityUtils;
 import me.mcx.common.core.exception.ServiceException;
 import me.mcx.common.core.web.domain.AjaxResult;
 import me.mcx.common.security.auth.AuthUtil;
-import me.mcx.system.api.domain.SysUser;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -53,7 +51,7 @@ public class ApiSayServiceImpl implements ApiSayService {
     public List<ApiSayVO> selectSayList() {
 
         //是否显示未公开的说说 登录用户id为1时显示所有说说
-        boolean showPrivate = AuthUtil.isLogin()  && SecurityContextHolder.getLoginIdAsString().equals("1");
+        boolean showPrivate = AuthUtil.isLogin()  && SecurityUtils.getLoginIdAsString().equals("1");
 
         List<ApiSayVO> sayPage = sayMapper.selectPublicSayList(showPrivate);
         for (ApiSayVO item : sayPage) {
@@ -67,7 +65,7 @@ public class ApiSayServiceImpl implements ApiSayService {
             item.setCreateTimeStr(RelativeDateFormat.format(item.getCreateTime()));
             item.setUserLikeList(likeUserList);
             if (AuthUtil.isLogin()){
-                item.setIsLike(redisService.sIsMember(RedisConstants.SAY_LIKE_USER + SecurityContextHolder.getLoginIdAsString(), item.getId()));
+                item.setIsLike(redisService.sIsMember(RedisConstants.SAY_LIKE_USER + SecurityUtils.getLoginIdAsString(), item.getId()));
             }
 
             List<BlogSayComment> sayComments = sayCommentMapper.selectBlogSayCommentList(new BlogSayComment() {{setSayId(item.getId());}});
@@ -90,7 +88,7 @@ public class ApiSayServiceImpl implements ApiSayService {
 
     @Override
     public AjaxResult like(String sayId) {
-        String userId = SecurityContextHolder.getLoginIdAsString();
+        String userId = SecurityUtils.getLoginIdAsString();
         // 判断是否点赞
         String sayLikeUser = RedisConstants.SAY_LIKE_USER + userId;
         String sayLike = RedisConstants.SAY_LIKE_KEY + sayId;
@@ -114,7 +112,7 @@ public class ApiSayServiceImpl implements ApiSayService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public AjaxResult comment(BlogSayComment sayComment) {
-        sayComment.setUserId(SecurityContextHolder.getLoginIdAsString());
+        sayComment.setUserId(SecurityUtils.getLoginIdAsString());
         sayComment.setIp(IpUtils.getIpAddr());
         sayComment.setIpAddress(sayComment.getIp());
         sayCommentMapper.insertBlogSayComment(sayComment);
@@ -124,7 +122,7 @@ public class ApiSayServiceImpl implements ApiSayService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public AjaxResult insertSay(BlogSay say) {
-        String userId = SecurityContextHolder.getLoginIdAsString();
+        String userId = SecurityUtils.getLoginIdAsString();
         if (!userId.equals("1")) {
             throw new ServiceException(ResultCode.NO_PERMISSION.desc);
         }

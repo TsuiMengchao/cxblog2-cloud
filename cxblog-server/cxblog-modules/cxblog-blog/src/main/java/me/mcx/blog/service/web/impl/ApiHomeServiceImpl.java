@@ -4,14 +4,13 @@ package me.mcx.blog.service.web.impl;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import me.mcx.blog.common.RedisConstants;
-import me.mcx.blog.common.ResponseResult;
 import me.mcx.blog.domain.BlogTags;
 import me.mcx.blog.domain.BlogWebConfig;
 import me.mcx.blog.mapper.BlogTagsMapper;
 import me.mcx.blog.mapper.BlogWebConfigMapper;
 import me.mcx.blog.mapper.web.ArticleMapper;
 import me.mcx.blog.service.web.ApiHomeService;
-import me.mcx.blog.service.web.RedisService;
+import me.mcx.blog.service.common.RedisService;
 import me.mcx.blog.util.CustomHttpUtil;
 import me.mcx.common.core.utils.ip.IpUtils;
 import me.mcx.blog.domain.vo.article.ApiArticleListVO;
@@ -47,7 +46,7 @@ public class ApiHomeServiceImpl implements ApiHomeService {
      * @return
      */
 
-    public ResponseResult report() {
+    public AjaxResult report() {
         // 获取ip
         String ipAddress = IpUtils.getIpAddr();
         String browser = IpUtils.getHostName();
@@ -64,7 +63,7 @@ public class ApiHomeServiceImpl implements ApiHomeService {
         // 访问量+1
         redisService.incr(RedisConstants.BLOG_VIEWS_COUNT, 1);
 
-        return ResponseResult.success(ipAddress);
+        return AjaxResult.success(ipAddress);
     }
 
     /**

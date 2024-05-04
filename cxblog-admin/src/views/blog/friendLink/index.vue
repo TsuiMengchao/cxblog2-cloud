@@ -9,53 +9,15 @@
           @keyup.enter="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="网站地址" prop="url">
-        <el-input
-          v-model="queryParams.url"
-          placeholder="请输入网站地址"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="网站头像地址" prop="avatar">
-        <el-input
-          v-model="queryParams.avatar"
-          placeholder="请输入网站头像地址"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="网站描述" prop="info">
-        <el-input
-          v-model="queryParams.info"
-          placeholder="请输入网站描述"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="邮箱" prop="email">
-        <el-input
-          v-model="queryParams.email"
-          placeholder="请输入邮箱"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="排序" prop="sort">
-        <el-input
-          v-model="queryParams.sort"
-          placeholder="请输入排序"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="下架原因" prop="reason">
-        <el-input
-          v-model="queryParams.reason"
-          placeholder="请输入下架原因"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+      <el-form-item label="状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
+          <el-option
+            v-for="dict in blog_friendlink_status"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -110,12 +72,23 @@
       <el-table-column label="主键ID" align="center" prop="id" />
       <el-table-column label="网站名称" align="center" prop="name" />
       <el-table-column label="网站地址" align="center" prop="url" />
-      <el-table-column label="网站头像地址" align="center" prop="avatar" />
+      <el-table-column label="网站头像地址" align="center" prop="avatar" width="100">
+        <template #default="scope">
+          <image-preview :src="scope.row.avatar" :width="50" :height="50"/>
+        </template>
+      </el-table-column>
       <el-table-column label="网站描述" align="center" prop="info" />
-      <el-table-column label="邮箱" align="center" prop="email" />
       <el-table-column label="排序" align="center" prop="sort" />
-      <el-table-column label="下架原因" align="center" prop="reason" />
-      <el-table-column label="ENUM-状态:"0,下架;1,申请;2:上架"" align="center" prop="status" />
+      <el-table-column label="状态" align="center" prop="status">
+        <template #default="scope">
+          <dict-tag :options="blog_friendlink_status" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+        <template #default="scope">
+          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
@@ -124,7 +97,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -143,7 +116,7 @@
           <el-input v-model="form.url" placeholder="请输入网站地址" />
         </el-form-item>
         <el-form-item label="网站头像地址" prop="avatar">
-          <el-input v-model="form.avatar" placeholder="请输入网站头像地址" />
+          <image-upload v-model="form.avatar"/>
         </el-form-item>
         <el-form-item label="网站描述" prop="info">
           <el-input v-model="form.info" placeholder="请输入网站描述" />
@@ -156,6 +129,16 @@
         </el-form-item>
         <el-form-item label="下架原因" prop="reason">
           <el-input v-model="form.reason" placeholder="请输入下架原因" />
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-select v-model="form.status" placeholder="请选择状态">
+            <el-option
+              v-for="dict in blog_friendlink_status"
+              :key="dict.value"
+              :label="dict.label"
+              :value="parseInt(dict.value)"
+            ></el-option>
+          </el-select>
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
@@ -175,6 +158,7 @@
 import { listFriendLink, getFriendLink, delFriendLink, addFriendLink, updateFriendLink } from "@/api/blog/friendLink";
 
 const { proxy } = getCurrentInstance();
+const { blog_friendlink_status } = proxy.useDict('blog_friendlink_status');
 
 const friendLinkList = ref([]);
 const open = ref(false);
@@ -192,13 +176,8 @@ const data = reactive({
     pageNum: 1,
     pageSize: 10,
     name: null,
-    url: null,
-    avatar: null,
-    info: null,
-    email: null,
-    sort: null,
-    reason: null,
     status: null,
+    remark: null
   },
   rules: {
     name: [
@@ -211,7 +190,7 @@ const data = reactive({
       { required: true, message: "网站描述不能为空", trigger: "blur" }
     ],
     status: [
-      { required: true, message: "ENUM-状态:"0,下架;1,申请;2:上架"不能为空", trigger: "change" }
+      { required: true, message: "状态不能为空", trigger: "change" }
     ],
   }
 });

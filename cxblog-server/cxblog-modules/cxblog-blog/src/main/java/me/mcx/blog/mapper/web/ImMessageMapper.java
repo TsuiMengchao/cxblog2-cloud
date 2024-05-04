@@ -22,7 +22,7 @@ public interface ImMessageMapper {
      * 获取历史聊天记录
      * @return
      */
-    List<ImMessageVO> selectPublicHistoryList(List<ImMessageVO> imMessageVOPage );
+    List<ImMessageVO> selectPublicHistoryList();
 
     /**
      * 获取在线用户列表
@@ -33,8 +33,7 @@ public interface ImMessageMapper {
      * 获取单聊历史聊天记录
      * @return
      */
-    List<ImMessageVO> selectPublicUserImHistoryList(@Param("page")List<ImMessageVO> imMessageVOPage,
-                                              @Param("fromUserId") String fromUserId,@Param("toUserId")String toUserId);
+    List<ImMessageVO> selectPublicUserImHistoryList(@Param("fromUserId") String fromUserId,@Param("toUserId")String toUserId);
 
     int selectListReadByUserId(@Param("toUserId") String toUserId, @Param("fromUserId")String fromUserId);
 
@@ -45,7 +44,7 @@ public interface ImMessageMapper {
      */
     void updateRead(@Param("fromUserId") String userId, @Param("toUserId") String loginIdAsString);
 
-    List<ImMessageVO> getMessageNotice(@Param("page")List<Object> objectPage, @Param("userId")String userId
+    List<ImMessageVO> getMessageNotice(@Param("userId")String userId
             , @Param("noticeType")Integer noticeType);
 
 }

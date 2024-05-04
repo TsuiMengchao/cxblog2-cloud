@@ -2,10 +2,7 @@ package me.mcx.blog.controller.web;
 
 
 import lombok.extern.slf4j.Slf4j;
-import me.mcx.blog.common.ResponseResult;
 import me.mcx.blog.service.web.ApiHomeService;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import me.mcx.common.core.web.controller.BaseController;
 import me.mcx.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @since 2021-09-03
  */
 @RestController
-@RequestMapping("/v1/")
+@RequestMapping("/v1")
 @Slf4j
 public class ApiHomeController extends BaseController {
 
@@ -37,7 +34,7 @@ public class ApiHomeController extends BaseController {
      * @return
      */
     @RequestMapping(value = "/report",method = RequestMethod.GET)
-    public ResponseResult report(){
+    public AjaxResult report(){
         return homeService.report();
     }
 
@@ -54,7 +51,7 @@ public class ApiHomeController extends BaseController {
      * 首页共享数据
      * @return
      */
-    @GetMapping("/")
+    @GetMapping
     public AjaxResult getHomeData(){
         return homeService.getHomeData();
     }

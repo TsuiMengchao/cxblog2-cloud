@@ -1,6 +1,5 @@
 package me.mcx.blog.service.web;
 
-import me.mcx.blog.common.ResponseResult;
 import me.mcx.common.core.web.domain.AjaxResult;
 
 
@@ -10,7 +9,7 @@ public interface ApiHomeService {
      * 添加访问量
      * @return
      */
-    public ResponseResult report();
+    public AjaxResult report();
 
     /**
      * 获取首页数据

@@ -15,7 +15,7 @@ import me.mcx.blog.mapper.BlogUserUserinfoMapper;
 import me.mcx.blog.mapper.web.UserInfoMapper;
 import me.mcx.blog.mapper.web.UserMapper;
 import me.mcx.blog.service.web.ApiUserService;
-import me.mcx.common.core.context.SecurityContextHolder;
+import me.mcx.common.security.utils.SecurityUtils;
 import me.mcx.common.core.exception.ServiceException;
 import me.mcx.common.core.web.domain.AjaxResult;
 import org.apache.commons.lang3.ObjectUtils;
@@ -52,7 +52,7 @@ public class ApiUserServiceImpl implements ApiUserService {
      */
     @Override
     public AjaxResult selectUserInfo(String userId) {
-        userId = StringUtils.isNotBlank(userId) ? userId : SecurityContextHolder.getLoginIdAsString();
+        userId = StringUtils.isNotBlank(userId) ? userId : SecurityUtils.getLoginIdAsString();
         UserInfoVO userInfo = userInfoMapper.selectUserInfoByUserId(userId);
         return AjaxResult.success(userInfo);
     }
@@ -66,7 +66,7 @@ public class ApiUserServiceImpl implements ApiUserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public AjaxResult updateUser(UserInfoDTO vo) {
-        BlogUserUserinfo user = blogUserUserinfoMapper.selectBlogUserUserinfoByUserId(Long.valueOf(SecurityContextHolder.getLoginIdAsString()));
+        BlogUserUserinfo user = blogUserUserinfoMapper.selectBlogUserUserinfoByUserId(Long.valueOf(SecurityUtils.getLoginIdAsString()));
         if (ObjectUtils.isEmpty(user)) {
             throw  new ServiceException("用户不存在");
         }
@@ -84,14 +84,14 @@ public class ApiUserServiceImpl implements ApiUserService {
      */
     @Override
     public AjaxResult selectUserInfoByToken(String token) {
-        Object userId = SecurityContextHolder.getUserId();
+        Object userId = SecurityUtils.getUserId();
         UserInfoVO userInfoVO = userMapper.selectInfoByUserIdNew(userId);
         return AjaxResult.success(userInfoVO);
     }
 
     @Override
     public AjaxResult getUserCount(String id) {
-        id = StringUtils.isBlank(id) ? SecurityContextHolder.getLoginIdAsString() : id;
+        id = StringUtils.isBlank(id) ? SecurityUtils.getLoginIdAsString() : id;
         String finalId = id;
         Integer articleCount = articleMapper.selectCount(new BlogArticle(){{setUserId(finalId);}});
         Integer collectCount = collectMapper.selectCount(new BlogArticleCollect(){{setUserId(finalId);}});

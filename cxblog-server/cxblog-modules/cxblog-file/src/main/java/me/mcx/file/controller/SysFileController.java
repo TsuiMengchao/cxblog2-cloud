@@ -1,8 +1,11 @@
 package me.mcx.file.controller;
 
+import me.mcx.file.context.SysFileServiceContext;
+import me.mcx.file.emnus.FileUploadModelEnum;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,16 +27,24 @@ public class SysFileController
     @Autowired
     private ISysFileService sysFileService;
 
+    @Autowired
+    private SysFileServiceContext sysFileServiceContext;
+    private FileUploadModelEnum strategy;
+
+    @Value("${files.upload-way}")
+    private String fileUploadWay;
+
     /**
      * 文件上传请求
      */
     @PostMapping("upload")
-    public R<SysFile> upload(MultipartFile file)
+    public R<SysFile> upload(MultipartFile file, String path)
     {
         try
         {
+            strategy = FileUploadModelEnum.getService(fileUploadWay);
             // 上传并返回访问地址
-            String url = sysFileService.uploadFile(file);
+            String url = sysFileServiceContext.executeFileUploadStrategy(strategy.getService(), file, path);
             SysFile sysFile = new SysFile();
             sysFile.setName(FileUtils.getName(url));
             sysFile.setUrl(url);

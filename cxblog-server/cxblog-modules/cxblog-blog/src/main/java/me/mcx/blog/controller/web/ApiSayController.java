@@ -1,6 +1,5 @@
 package me.mcx.blog.controller.web;
 
-import me.mcx.blog.annotation.SaCheckLogin;
 import me.mcx.blog.domain.BlogSay;
 import me.mcx.blog.domain.BlogSayComment;
 import me.mcx.blog.service.web.ApiSayService;
@@ -24,7 +23,7 @@ public class ApiSayController extends BaseController {
      * 说说列表
      * @return
      */
-    @RequestMapping(value = "getSayList",method = RequestMethod.GET)
+    @RequestMapping(value = "/getSayList",method = RequestMethod.GET)
     public TableDataInfo selectSayList(){
         startPage();
         return getDataTable(apiSayService.selectSayList());
@@ -35,8 +34,7 @@ public class ApiSayController extends BaseController {
      * @param sayId
      * @return
      */
-    @SaCheckLogin
-    @RequestMapping(value = "like",method = RequestMethod.GET)
+    @RequestMapping(value = "/like",method = RequestMethod.GET)
     public AjaxResult like(String sayId){
         return apiSayService.like(sayId);
     }
@@ -46,8 +44,7 @@ public class ApiSayController extends BaseController {
      * @param sayComment
      * @return
      */
-    @SaCheckLogin
-    @RequestMapping(value = "comment",method = RequestMethod.POST)
+    @RequestMapping(value = "/comment",method = RequestMethod.POST)
     public AjaxResult comment(@RequestBody BlogSayComment sayComment){
         return apiSayService.comment(sayComment);
     }
@@ -57,8 +54,7 @@ public class ApiSayController extends BaseController {
      * @param say
      * @return
      */
-    @SaCheckLogin
-    @RequestMapping(value = "insertSay",method = RequestMethod.POST)
+    @RequestMapping(value = "/insertSay",method = RequestMethod.POST)
     public AjaxResult insertSay(@RequestBody BlogSay say){
         return apiSayService.insertSay(say);
     }

@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Calendar;
 import java.util.Date;
 import org.apache.commons.lang3.time.DateFormatUtils;
 
@@ -160,6 +161,27 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils
         // 计算差多少秒//输出结果
         // long sec = diff % nd % nh % nm / ns;
         return day + "天" + hour + "小时" + min + "分钟";
+    }
+
+    /**
+     * 计算俩个时间相差的分钟
+     * @param endDate
+     * @param nowDate
+     * @return
+     */
+    public static long getDiffDateToMinutes (Date endDate, Date nowDate) {
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(nowDate);
+        long startTimeMillis = calendar.getTimeInMillis();
+
+        calendar.setTime(endDate);
+        long endTimeMillis = calendar.getTimeInMillis();
+
+        long durationMillis = startTimeMillis - endTimeMillis;
+        long minutes = durationMillis / (60 * 1000);
+
+        return minutes;
     }
 
     /**

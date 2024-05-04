@@ -15,7 +15,7 @@ export function validateTodayIsSign() {
 }
 export function sign(time) {
     return request({
-        url: '/api/v1/sign/',
+        url: '/api/v1/sign',
         method: 'get',
         params: {
             time: time

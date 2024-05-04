@@ -1,22 +1,6 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="用户id" prop="userId">
-        <el-input
-          v-model="queryParams.userId"
-          placeholder="请输入用户id"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="话题id" prop="talkId">
-        <el-input
-          v-model="queryParams.talkId"
-          placeholder="请输入话题id"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
         <el-button icon="Refresh" @click="resetQuery">重置</el-button>
@@ -68,12 +52,13 @@
     <el-table v-loading="loading" :data="forumList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="id" align="center" prop="id" />
-      <el-table-column label="用户id" align="center" prop="userId" />
-      <el-table-column label="话题id" align="center" prop="talkId" />
       <el-table-column label="内容" align="center" prop="content" />
       <el-table-column label="关联网页信息" align="center" prop="site" />
-      <el-table-column label="关联图片地址" align="center" prop="imgUrl" />
-      <el-table-column label="备注" align="center" prop="remark" />
+      <el-table-column label="关联图片地址" align="center" prop="imgUrl" width="100">
+        <template #default="scope">
+          <image-preview :src="scope.row.imgUrl" :width="50" :height="50"/>
+        </template>
+      </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['blog:forum:edit']">修改</el-button>
@@ -90,23 +75,14 @@
       @pagination="getList"
     />
 
-    <!-- 添加或修改圈子话题对话框 -->
+    <!-- 添加或修改论坛对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
       <el-form ref="forumRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="用户id" prop="userId">
-          <el-input v-model="form.userId" placeholder="请输入用户id" />
-        </el-form-item>
-        <el-form-item label="话题id" prop="talkId">
-          <el-input v-model="form.talkId" placeholder="请输入话题id" />
-        </el-form-item>
         <el-form-item label="内容">
           <editor v-model="form.content" :min-height="192"/>
         </el-form-item>
         <el-form-item label="关联图片地址" prop="imgUrl">
-          <el-input v-model="form.imgUrl" type="textarea" placeholder="请输入内容" />
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+          <image-upload v-model="form.imgUrl"/>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -139,11 +115,6 @@ const data = reactive({
   queryParams: {
     pageNum: 1,
     pageSize: 10,
-    userId: null,
-    talkId: null,
-    content: null,
-    site: null,
-    imgUrl: null,
   },
   rules: {
     userId: [
@@ -154,7 +125,7 @@ const data = reactive({
 
 const { queryParams, form, rules } = toRefs(data);
 
-/** 查询圈子话题列表 */
+/** 查询论坛列表 */
 function getList() {
   loading.value = true;
   listForum(queryParams.value).then(response => {
@@ -211,7 +182,7 @@ function handleSelectionChange(selection) {
 function handleAdd() {
   reset();
   open.value = true;
-  title.value = "添加圈子话题";
+  title.value = "添加论坛";
 }
 
 /** 修改按钮操作 */
@@ -221,7 +192,7 @@ function handleUpdate(row) {
   getForum(_id).then(response => {
     form.value = response.data;
     open.value = true;
-    title.value = "修改圈子话题";
+    title.value = "修改论坛";
   });
 }
 
@@ -249,7 +220,7 @@ function submitForm() {
 /** 删除按钮操作 */
 function handleDelete(row) {
   const _ids = row.id || ids.value;
-  proxy.$modal.confirm('是否确认删除圈子话题编号为"' + _ids + '"的数据项？').then(function() {
+  proxy.$modal.confirm('是否确认删除论坛编号为"' + _ids + '"的数据项？').then(function() {
     return delForum(_ids);
   }).then(() => {
     getList();

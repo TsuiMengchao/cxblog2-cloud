@@ -20,7 +20,7 @@ public interface ApiImMessageService {
      * 获取历史聊天记录
      * @return
      */
-    AjaxResult selectHistoryList();
+    List<ImMessageVO> selectHistoryList();
 
 
     /**
@@ -32,7 +32,7 @@ public interface ApiImMessageService {
      * 获取单聊历史消息
      * @return
      */
-    AjaxResult selectUserImHistoryList(String fromUserId, String toUserId);
+    List<ImMessageVO> selectUserImHistoryList(String fromUserId, String toUserId);
 
     /**
      * 获取房间列表
@@ -79,7 +79,7 @@ public interface ApiImMessageService {
      * 获取跟当前用户有关的系统通知
      * @return
      */
-    AjaxResult getMessageNotice(Integer type);
+    List<ImMessageVO> getMessageNotice(Integer type);
 
     /**
      * 获取未读的最新系统通知
@@ -99,7 +99,7 @@ public interface ApiImMessageService {
      * @param type
      * @return
      */
-    AjaxResult getMessageNoticeApplet(Integer type);
+    List<ImMessageVO> getMessageNoticeApplet(Integer type);
 
     /**
      * 标记消息为已读

@@ -3,6 +3,7 @@ package me.mcx.blog.controller.web;
 import me.mcx.blog.service.web.ApiTagService;
 import me.mcx.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,8 +27,7 @@ public class ApiTagsController {
      * 标签列表
      * @return
      */
-    @RequestMapping(value = "/",method = RequestMethod.GET)
-
+    @GetMapping
     public AjaxResult selectTagList(){
         return tagsService.selectTagList();
     }

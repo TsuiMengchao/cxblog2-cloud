@@ -9,12 +9,15 @@ export function listSystemConfig(query) {
   })
 }
 
-// 查询系统配置详细
-export function getSystemConfig(id) {
+/**
+ * 获取数据
+ *
+ */
+export function getSystemConfig(){
   return request({
-    url: '/blog/systemConfig/' + id,
-    method: 'get'
-  })
+    url: "/blog/systemConfig/getConfig",
+    method: "get",
+  });
 }
 
 // 新增系统配置
@@ -26,13 +29,17 @@ export function addSystemConfig(data) {
   })
 }
 
-// 修改系统配置
+/**
+ * 修改
+ *
+ * @param data
+ */
 export function updateSystemConfig(data) {
   return request({
-    url: '/blog/systemConfig',
-    method: 'put',
-    data: data
-  })
+    url: "/blog/systemConfig/update",
+    method: "put",
+    data
+  });
 }
 
 // 删除系统配置

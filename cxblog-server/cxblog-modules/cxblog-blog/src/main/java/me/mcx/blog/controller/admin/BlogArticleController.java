@@ -2,6 +2,10 @@ package me.mcx.blog.controller.admin;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import me.mcx.blog.domain.dto.article.ArticleDTO;
+import me.mcx.blog.domain.vo.article.SystemArticleListVO;
+import me.mcx.blog.service.common.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,15 +38,18 @@ public class BlogArticleController extends BaseController
     @Autowired
     private IBlogArticleService blogArticleService;
 
+    @Autowired
+    private ArticleService articleService;
+
     /**
      * 查询博客文章列表
      */
     @RequiresPermissions("blog:article:list")
     @GetMapping("/list")
-    public TableDataInfo list(BlogArticle blogArticle)
+    public TableDataInfo list(String title,Integer tagId,Integer categoryId,Integer isPublish)
     {
         startPage();
-        List<BlogArticle> list = blogArticleService.selectBlogArticleList(blogArticle);
+        List<SystemArticleListVO> list = articleService.selectArticlePage(title,tagId,categoryId,isPublish);
         return getDataTable(list);
     }
 
@@ -66,7 +73,7 @@ public class BlogArticleController extends BaseController
     @GetMapping(value = "/{id}")
     public AjaxResult getInfo(@PathVariable("id") Long id)
     {
-        return success(blogArticleService.selectBlogArticleById(id));
+        return blogArticleService.selectArticleById(id);
     }
 
     /**
@@ -101,4 +108,59 @@ public class BlogArticleController extends BaseController
     {
         return toAjax(blogArticleService.deleteBlogArticleByIds(ids));
     }
+
+
+    /**
+     * 置顶文章
+     * @param article
+     * @return
+     */
+    @PutMapping(value = "/top")
+    @RequiresPermissions("blog:article:top")
+    public AjaxResult topArticle(@RequestBody ArticleDTO article) {
+        return articleService.topArticle(article);
+    }
+
+    /**
+     * 发布或下架文章
+     * @param article
+     * @return
+     */
+    @PutMapping(value = "/pubOrShelf")
+    @RequiresPermissions("blog:article:pubOrShelf")
+    public AjaxResult psArticle(@RequestBody BlogArticle article) {
+        return articleService.psArticle(article);
+    }
+
+    /**
+     * 批量文章SEO
+     * @param ids
+     * @return
+     */
+    @PostMapping(value = "/seo")
+    @RequiresPermissions("blog:article:seo")
+    public AjaxResult seoArticle(@RequestBody List<Long> ids) {
+        return articleService.seoArticle(ids);
+    }
+
+    /**
+     * 文章爬虫
+     * @param url
+     * @return
+     */
+    @GetMapping(value = "/reptile")
+    @RequiresPermissions("blog:article:reptile")
+    public AjaxResult reptile(String url) {
+        return articleService.reptile(url);
+    }
+
+    /**
+     * 随机获取一张图片
+     * @return
+     */
+    @GetMapping(value = "/randomImg")
+    public AjaxResult randomImg() {
+        return articleService.randomImg();
+    }
+
 }

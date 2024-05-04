@@ -50,3 +50,16 @@ export function delData(dictCode) {
     method: 'delete'
   })
 }
+
+/**
+ * 获取字典类型的数据项
+ *
+ * @param data
+ */
+export function getDataByDictType(data){
+  return request({
+    url: "/system/dict/data/getDataByDictType",
+    method: "post",
+    data
+  });
+}

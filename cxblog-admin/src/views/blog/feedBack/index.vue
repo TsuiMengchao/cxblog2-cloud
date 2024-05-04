@@ -1,14 +1,6 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="用户id" prop="userId">
-        <el-input
-          v-model="queryParams.userId"
-          placeholder="请输入用户id"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="标题" prop="title">
         <el-input
           v-model="queryParams.title"
@@ -17,13 +9,25 @@
           @keyup.enter="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="图片地址" prop="imgUrl">
-        <el-input
-          v-model="queryParams.imgUrl"
-          placeholder="请输入图片地址"
-          clearable
-          @keyup.enter="handleQuery"
-        />
+      <el-form-item label="反馈类型" prop="type">
+        <el-select v-model="queryParams.type" placeholder="请选择反馈类型" clearable>
+          <el-option
+            v-for="dict in blog_feedback_type"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+        </el-select>
+      </el-form-item>
+      <el-form-item label="状态" prop="status">
+        <el-select v-model="queryParams.status" placeholder="请选择状态" clearable>
+          <el-option
+            v-for="dict in blog_feedback_status"
+            :key="dict.value"
+            :label="dict.label"
+            :value="dict.value"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
@@ -76,13 +80,24 @@
     <el-table v-loading="loading" :data="feedBackList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="ID" align="center" prop="id" />
-      <el-table-column label="用户id" align="center" prop="userId" />
       <el-table-column label="标题" align="center" prop="title" />
       <el-table-column label="详细内容" align="center" prop="content" />
-      <el-table-column label="图片地址" align="center" prop="imgUrl" />
-      <el-table-column label="反馈类型 1:需求 2：缺陷" align="center" prop="type" />
-      <el-table-column label="状态 0未解决 1解决" align="center" prop="status" />
-      <el-table-column label="备注" align="center" prop="remark" />
+      <el-table-column label="图片地址" align="center" prop="imgUrl" width="100">
+        <template #default="scope">
+          <image-preview :src="scope.row.imgUrl" :width="50" :height="50"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="反馈类型" align="center" prop="type">
+        <template #default="scope">
+          <dict-tag :options="blog_feedback_type" :value="scope.row.type"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="状态" align="center" prop="status">
+        <template #default="scope">
+          <dict-tag :options="blog_feedback_status" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建者" align="center" prop="createBy" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['blog:feedBack:edit']">修改</el-button>
@@ -102,9 +117,6 @@
     <!-- 添加或修改问题反馈对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
       <el-form ref="feedBackRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="用户id" prop="userId">
-          <el-input v-model="form.userId" placeholder="请输入用户id" />
-        </el-form-item>
         <el-form-item label="标题" prop="title">
           <el-input v-model="form.title" placeholder="请输入标题" />
         </el-form-item>
@@ -112,10 +124,26 @@
           <editor v-model="form.content" :min-height="192"/>
         </el-form-item>
         <el-form-item label="图片地址" prop="imgUrl">
-          <el-input v-model="form.imgUrl" placeholder="请输入图片地址" />
+          <image-upload v-model="form.imgUrl"/>
         </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+        <el-form-item label="反馈类型" prop="type">
+          <el-select v-model="form.type" placeholder="请选择反馈类型">
+            <el-option
+              v-for="dict in blog_feedback_type"
+              :key="dict.value"
+              :label="dict.label"
+              :value="parseInt(dict.value)"
+            ></el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-radio-group v-model="form.status">
+            <el-radio
+              v-for="dict in blog_feedback_status"
+              :key="dict.value"
+              :label="parseInt(dict.value)"
+            >{{dict.label}}</el-radio>
+          </el-radio-group>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -132,6 +160,7 @@
 import { listFeedBack, getFeedBack, delFeedBack, addFeedBack, updateFeedBack } from "@/api/blog/feedBack";
 
 const { proxy } = getCurrentInstance();
+const { blog_feedback_status, blog_feedback_type } = proxy.useDict('blog_feedback_status', 'blog_feedback_type');
 
 const feedBackList = ref([]);
 const open = ref(false);
@@ -148,10 +177,7 @@ const data = reactive({
   queryParams: {
     pageNum: 1,
     pageSize: 10,
-    userId: null,
     title: null,
-    content: null,
-    imgUrl: null,
     type: null,
     status: null,
   },
@@ -163,10 +189,10 @@ const data = reactive({
       { required: true, message: "标题不能为空", trigger: "blur" }
     ],
     type: [
-      { required: true, message: "反馈类型 1:需求 2：缺陷不能为空", trigger: "change" }
+      { required: true, message: "反馈类型不能为空", trigger: "change" }
     ],
     status: [
-      { required: true, message: "状态 0未解决 1解决不能为空", trigger: "change" }
+      { required: true, message: "状态不能为空", trigger: "change" }
     ],
   }
 });

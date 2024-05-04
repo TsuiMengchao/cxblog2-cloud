@@ -2,6 +2,7 @@ package me.mcx.blog.service;
 
 import java.util.List;
 import me.mcx.blog.domain.BlogArticle;
+import me.mcx.common.core.web.domain.AjaxResult;
 
 /**
  * 博客文章Service接口
@@ -11,6 +12,11 @@ import me.mcx.blog.domain.BlogArticle;
  */
 public interface IBlogArticleService 
 {
+    /**
+     *  后台获取文章详情
+     * @return
+     */
+    public AjaxResult selectArticleById(Long id);
     /**
      * 查询博客文章
      * 

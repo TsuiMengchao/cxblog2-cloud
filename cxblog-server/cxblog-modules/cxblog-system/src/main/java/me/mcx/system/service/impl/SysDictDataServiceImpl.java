@@ -1,8 +1,13 @@
 package me.mcx.system.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import me.mcx.common.core.web.domain.AjaxResult;
+import me.mcx.system.api.domain.SysDictType;
 import me.mcx.system.mapper.SysDictDataMapper;
+import me.mcx.system.mapper.SysDictTypeMapper;
 import me.mcx.system.service.ISysDictDataService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +24,9 @@ public class SysDictDataServiceImpl implements ISysDictDataService
 {
     @Autowired
     private SysDictDataMapper dictDataMapper;
+
+    @Autowired
+    private SysDictTypeMapper dictMapper;
 
     /**
      * 根据条件分页查询字典数据
@@ -108,5 +116,38 @@ public class SysDictDataServiceImpl implements ISysDictDataService
             DictUtils.setDictCache(data.getDictType(), dictDatas);
         }
         return row;
+    }
+
+
+    /**
+     * 根据字典类型获取字典数据
+     * @param types
+     * @return
+     */
+    @Override
+    public AjaxResult getDataByDictType(List<String> types) {
+        Map<String, Map<String, Object>> map = new HashMap<>();
+
+        types.forEach(item ->{
+            SysDictData sysDictDataQueryWrapper = new SysDictData() {{
+                setStatus("0");
+                setDictType(item);
+            }};
+            List<SysDictData> dataList = dictDataMapper.selectDictDataList(sysDictDataQueryWrapper);
+            String defaultValue = null;
+            for (SysDictData dictData : dataList) {
+                //选取默认值
+                if (dictData.getIsDefault().equals("1")){
+                    defaultValue = dictData.getDictValue();
+                    break;
+
+                }
+            }
+            Map<String, Object> result = new HashMap<>();
+            result.put("defaultValue",defaultValue);
+            result.put("list",dataList);
+            map.put(item,result);
+        });
+        return AjaxResult.success(map);
     }
 }

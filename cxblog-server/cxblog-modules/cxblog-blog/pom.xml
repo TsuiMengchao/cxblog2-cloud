@@ -53,6 +53,12 @@
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
         </dependency>
+
+        <!-- CXBlog Common DataSource -->
+        <dependency>
+            <groupId>me.mcx</groupId>
+            <artifactId>cxblog-common-security</artifactId>
+        </dependency>
         
         <!-- CXBlog Common DataSource -->
         <dependency>
@@ -97,6 +103,12 @@
             <version>5.8.3</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.14.3</version> <!-- or latest version -->
+        </dependency>
+
         <!-- 即时通讯-->
         <dependency>
             <groupId>io.netty</groupId>
@@ -109,6 +121,13 @@
             <groupId>org.dromara.easy-es</groupId>
             <artifactId>easy-es-boot-starter</artifactId>
             <version>2.0.0-beta8</version>
+        </dependency>
+
+        <!--Markdown 转 Html-->
+        <dependency>
+            <groupId>com.vladsch.flexmark</groupId>
+            <artifactId>flexmark-all</artifactId>
+            <version>0.62.2</version>
         </dependency>
 
     </dependencies>

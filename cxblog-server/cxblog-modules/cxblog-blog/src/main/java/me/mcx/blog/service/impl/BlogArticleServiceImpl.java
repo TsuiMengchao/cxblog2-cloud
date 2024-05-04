@@ -1,7 +1,12 @@
 package me.mcx.blog.service.impl;
 
 import java.util.List;
+
+import me.mcx.blog.domain.dto.article.ArticleDTO;
+import me.mcx.blog.mapper.web.ArticleMapper;
+import me.mcx.blog.mapper.web.TagsMapper;
 import me.mcx.common.core.utils.DateUtils;
+import me.mcx.common.core.web.domain.AjaxResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import me.mcx.blog.mapper.BlogArticleMapper;
@@ -19,6 +24,23 @@ public class BlogArticleServiceImpl implements IBlogArticleService
 {
     @Autowired
     private BlogArticleMapper blogArticleMapper;
+
+    @Autowired
+    private ArticleMapper articleMapper;
+
+    @Autowired
+    private TagsMapper tagsMapper;
+
+    /**
+     *  后台获取文章详情
+     * @return
+     */
+    @Override
+    public AjaxResult selectArticleById(Long id) {
+        ArticleDTO articleDTO = articleMapper.selectArticlePrimaryKey(id);
+        articleDTO.setTags(tagsMapper.selectByArticleId(id));
+        return AjaxResult.success(articleDTO);
+    }
 
     /**
      * 查询博客文章

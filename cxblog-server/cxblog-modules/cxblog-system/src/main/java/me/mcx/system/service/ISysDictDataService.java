@@ -1,6 +1,8 @@
 package me.mcx.system.service;
 
 import java.util.List;
+
+import me.mcx.common.core.web.domain.AjaxResult;
 import me.mcx.system.api.domain.SysDictData;
 
 /**
@@ -57,4 +59,11 @@ public interface ISysDictDataService
      * @return 结果
      */
     public int updateDictData(SysDictData dictData);
+
+    /**
+     * 根绝字典类型集合获取字典数据
+     * @param types
+     * @return
+     */
+    AjaxResult getDataByDictType(List<String> types);
 }

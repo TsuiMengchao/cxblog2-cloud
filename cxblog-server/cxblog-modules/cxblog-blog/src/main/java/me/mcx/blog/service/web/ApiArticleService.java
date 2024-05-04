@@ -62,7 +62,7 @@ public interface ApiArticleService {
      * 查询我的文章
      * @return
      */
-    AjaxResult selectArticleByUserId(String userId, Integer type);
+    List<ApiArticleListVO> selectArticleByUserId(String userId, Integer type);
 
 
     /**

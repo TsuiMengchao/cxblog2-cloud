@@ -140,4 +140,24 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
+    <select id="selectBlogImMessageCount" parameterType="BlogImMessage" resultType="Integer">
+        SELECT COUNT(*) AS count FROM blog_im_message
+        <where>
+            <if test="toUserId != null  and toUserId != ''"> and to_user_id = #{toUserId}</if>
+            <if test="fromUserId != null  and fromUserId != ''"> and from_user_id = #{fromUserId}</if>
+            <if test="toUserAvatar != null  and toUserAvatar != ''"> and to_user_avatar = #{toUserAvatar}</if>
+            <if test="content != null  and content != ''"> and content = #{content}</if>
+            <if test="ipSource != null  and ipSource != ''"> and ip_source = #{ipSource}</if>
+            <if test="ip != null  and ip != ''"> and ip = #{ip}</if>
+            <if test="isWithdraw != null "> and is_withdraw = #{isWithdraw}</if>
+            <if test="isRead != null "> and is_read = #{isRead}</if>
+            <if test="type != null "> and type = #{type}</if>
+            <if test="code != null "> and code = #{code}</if>
+            <if test="articleId != null "> and article_id = #{articleId}</if>
+            <if test="noticeType != null "> and notice_type = #{noticeType}</if>
+            <if test="commentMark != null "> and comment_mark = #{commentMark}</if>
+            <if test="atUserId != null  and atUserId != ''"> and at_user_id = #{atUserId}</if>
+        </where>
+    </select>
 </mapper>

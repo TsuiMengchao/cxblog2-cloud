@@ -1,14 +1,6 @@
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryRef" :inline="true" v-show="showSearch" label-width="68px">
-      <el-form-item label="用户id" prop="userId">
-        <el-input
-          v-model="queryParams.userId"
-          placeholder="请输入用户id"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
       <el-form-item label="标题" prop="title">
         <el-input
           v-model="queryParams.title"
@@ -68,12 +60,14 @@
     <el-table v-loading="loading" :data="tipsoonList" @selection-change="handleSelectionChange">
       <el-table-column type="selection" width="55" align="center" />
       <el-table-column label="id" align="center" prop="id" />
-      <el-table-column label="用户id" align="center" prop="userId" />
       <el-table-column label="内容" align="center" prop="content" />
       <el-table-column label="关联网页信息" align="center" prop="site" />
-      <el-table-column label="关联图片地址" align="center" prop="imgUrl" />
+      <el-table-column label="关联图片地址" align="center" prop="imgUrl" width="100">
+        <template #default="scope">
+          <image-preview :src="scope.row.imgUrl" :width="50" :height="50"/>
+        </template>
+      </el-table-column>
       <el-table-column label="标题" align="center" prop="title" />
-      <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
           <el-button link type="primary" icon="Edit" @click="handleUpdate(scope.row)" v-hasPermi="['blog:tipsoon:edit']">修改</el-button>
@@ -93,20 +87,14 @@
     <!-- 添加或修改简讯对话框 -->
     <el-dialog :title="title" v-model="open" width="500px" append-to-body>
       <el-form ref="tipsoonRef" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="用户id" prop="userId">
-          <el-input v-model="form.userId" placeholder="请输入用户id" />
-        </el-form-item>
         <el-form-item label="内容">
           <editor v-model="form.content" :min-height="192"/>
         </el-form-item>
         <el-form-item label="关联图片地址" prop="imgUrl">
-          <el-input v-model="form.imgUrl" type="textarea" placeholder="请输入内容" />
+          <image-upload v-model="form.imgUrl"/>
         </el-form-item>
         <el-form-item label="标题" prop="title">
           <el-input v-model="form.title" placeholder="请输入标题" />
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
         </el-form-item>
       </el-form>
       <template #footer>
@@ -139,10 +127,6 @@ const data = reactive({
   queryParams: {
     pageNum: 1,
     pageSize: 10,
-    userId: null,
-    content: null,
-    site: null,
-    imgUrl: null,
     title: null,
   },
   rules: {

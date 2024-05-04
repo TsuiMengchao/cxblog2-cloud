@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function getCollect(params) {
     return request({
-        url: '/api/v1/collect/',
+        url: '/api/v1/collect',
         method: 'get',
         params: params
     })
@@ -18,7 +18,7 @@ export function collect(articleId) {
 }
 export function cancelCollect(articleId) {
     return request({
-        url: '/api/v1/collect/',
+        url: '/api/v1/collect',
         method: 'delete',
         params: {
             articleId: articleId

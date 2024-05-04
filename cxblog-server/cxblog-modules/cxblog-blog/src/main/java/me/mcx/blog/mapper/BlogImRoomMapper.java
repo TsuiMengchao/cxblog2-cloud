@@ -1,6 +1,8 @@
 package me.mcx.blog.mapper;
 
 import java.util.List;
+
+import me.mcx.blog.domain.BlogArticleCollect;
 import me.mcx.blog.domain.BlogImRoom;
 
 /**

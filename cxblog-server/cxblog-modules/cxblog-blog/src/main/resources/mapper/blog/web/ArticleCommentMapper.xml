@@ -28,7 +28,7 @@
 
 
     <select id="selectCommentPage" resultType="me.mcx.blog.domain.vo.message.ApiCommentListVO">
-        select c.*, ui.nickname as nickname, ui.web_site as webSite, ui.avatar as avatar
+        select c.*, c.user_id as userId, ui.nickname as nickname, ui.web_site as webSite, ui.avatar as avatar
         from blog_article_comment c
                  left join `cxblog-cloud`.sys_user u on c.user_id = u.user_id
                  left join blog_user_userinfo uui on uui.user_info_id = u.user_id

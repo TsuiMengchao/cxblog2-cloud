@@ -1,10 +1,8 @@
 package me.mcx.blog.controller.web;
 
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import me.mcx.blog.annotation.AccessLimit;
-import me.mcx.blog.annotation.SaCheckLogin;
 import me.mcx.blog.domain.dto.article.ArticlePostDTO;
 import me.mcx.blog.service.web.ApiArticleService;
 import me.mcx.common.core.web.controller.BaseController;
@@ -27,7 +25,7 @@ public class ApiArticleController extends BaseController {
 
     private final ApiArticleService articleService;
 
-    @GetMapping(value = "/")
+    @GetMapping
     /**
      * 查询所有文章
      */
@@ -92,8 +90,7 @@ public class ApiArticleController extends BaseController {
      * @param dto
      * @return
      */
-    @SaCheckLogin
-    @PostMapping(value = "/")
+    @PostMapping
     public AjaxResult insertArticle(@RequestBody ArticlePostDTO dto) {
         return articleService.insertArticle(dto);
     }
@@ -103,8 +100,7 @@ public class ApiArticleController extends BaseController {
      * @param dto
      * @return
      */
-    @SaCheckLogin
-    @PutMapping(value = "/")
+    @PutMapping
     public AjaxResult updateMyArticle(@RequestBody ArticlePostDTO dto) {
         return articleService.updateMyArticle(dto);
     }
@@ -115,10 +111,10 @@ public class ApiArticleController extends BaseController {
      * @param type
      * @return
      */
-    @SaCheckLogin
     @GetMapping(value = "/selectArticleByUserId")
-    public AjaxResult selectArticleByUserId(String userId,Integer type) {
-        return articleService.selectArticleByUserId(userId,type);
+    public TableDataInfo selectArticleByUserId(String userId,Integer type) {
+        startPage();
+        return getDataTable(articleService.selectArticleByUserId(userId,type));
     }
 
     /**
@@ -126,8 +122,7 @@ public class ApiArticleController extends BaseController {
      * @param id
      * @return
      */
-    @SaCheckLogin
-    @DeleteMapping(value = "/")
+    @DeleteMapping
     public AjaxResult deleteMyArticle(Long id) {
         return articleService.deleteMyArticle(id);
     }
@@ -137,7 +132,6 @@ public class ApiArticleController extends BaseController {
      * @param id
      * @return
      */
-    @SaCheckLogin
     @GetMapping(value = "/selectMyArticleInfo")
     public AjaxResult selectMyArticleInfo(Long id) {
         return articleService.selectMyArticleInfo(id);

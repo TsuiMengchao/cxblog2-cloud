@@ -1,6 +1,8 @@
 package me.mcx.common.security.utils;
 
 import javax.servlet.http.HttpServletRequest;
+
+import me.mcx.common.core.text.Convert;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import me.mcx.common.core.constant.SecurityConstants;
 import me.mcx.common.core.constant.TokenConstants;
@@ -23,6 +25,15 @@ public class SecurityUtils
     {
         return SecurityContextHolder.getUserId();
     }
+
+    public static String getLoginIdDefaultNull() {
+        return Convert.toStr(SecurityContextHolder.getUserId(), null);
+    }
+
+    public static String getLoginIdAsString() {
+        return Convert.toStr(SecurityContextHolder.getUserId(), "");
+    }
+
 
     /**
      * 获取用户名称

@@ -2,15 +2,10 @@ package me.mcx.blog.controller.admin;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import me.mcx.blog.service.common.SystemConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import me.mcx.common.log.annotation.Log;
 import me.mcx.common.log.enums.BusinessType;
 import me.mcx.common.security.annotation.RequiresPermissions;
@@ -33,6 +28,9 @@ public class BlogSystemConfigController extends BaseController
 {
     @Autowired
     private IBlogSystemConfigService blogSystemConfigService;
+
+    @Autowired
+    private SystemConfigService systemConfigService;
 
     /**
      * 查询系统配置列表
@@ -100,5 +98,25 @@ public class BlogSystemConfigController extends BaseController
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         return toAjax(blogSystemConfigService.deleteBlogSystemConfigByIds(ids));
+    }
+
+    /**
+     * 查询系统配置
+     * @return
+     */
+    @RequestMapping(value = "/getConfig",method = RequestMethod.GET)
+    public AjaxResult getSystemConfig(){
+        return systemConfigService.getSystemConfig();
+    }
+
+    /**
+     * 修改系统配置
+     * @param systemConfig
+     * @return
+     */
+    @RequestMapping(value = "/update",method = RequestMethod.PUT)
+    @RequiresPermissions("blog:sysConfig:edit")
+    public AjaxResult updateSystemConfig(@RequestBody BlogSystemConfig systemConfig){
+        return systemConfigService.updateSystemConfig(systemConfig);
     }
 }

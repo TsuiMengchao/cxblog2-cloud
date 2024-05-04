@@ -2,7 +2,7 @@ import request from '@/utils/request'
 
 export function featchComments(params) {
     return request({
-        url: '/api/v1/comment/',
+        url: '/api/v1/comment',
         method: 'get',
         params: params
     })
@@ -23,7 +23,7 @@ export function newArticle() {
 
 export function postComment(data) {
     return request({
-        url: '/api/v1/comment/',
+        url: '/api/v1/comment',
         method: 'post',
         data
     })

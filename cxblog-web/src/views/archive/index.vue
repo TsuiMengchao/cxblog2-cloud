@@ -87,7 +87,7 @@ function open(i) {
 function getArchiveArticleList() {
   archiveArticle().then((res) => {
     archiveList.value = res.data;
-    count.value = res.extra.total;
+    count.value = res.total;
   }).finally(() => (fullscreenLoading.value = false));
 }
 

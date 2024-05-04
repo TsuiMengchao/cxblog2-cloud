@@ -8,8 +8,11 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import me.mcx.common.core.exception.UtilException;
 import org.apache.commons.lang3.ArrayUtils;
 import me.mcx.common.core.utils.StringUtils;
 
@@ -27,6 +30,24 @@ public class FileUtils
     public static final char BACKSLASH = '\\';
 
     public static String FILENAME_PATTERN = "[a-zA-Z0-9_\\-\\|\\.\\u4e00-\\u9fa5]+";
+
+    /**
+     * 定义GB的计算常量
+     */
+    private static final int GB = 1024 * 1024 * 1024;
+    /**
+     * 定义MB的计算常量
+     */
+    private static final int MB = 1024 * 1024;
+    /**
+     * 定义KB的计算常量
+     */
+    private static final int KB = 1024;
+
+    /**
+     * 格式化小数
+     */
+    private static final DecimalFormat DF = new DecimalFormat("0.00");
 
     /**
      * 输出指定文件的byte数组
@@ -249,5 +270,59 @@ public class FileUtils
     {
         String encode = URLEncoder.encode(s, StandardCharsets.UTF_8.toString());
         return encode.replaceAll("\\+", "%20");
+    }
+
+    /**
+     * Java文件操作 获取不带扩展名的文件名
+     */
+    public static String getFileNameNoEx(String filename) {
+        if ((filename != null) && (filename.length() > 0)) {
+            int dot = filename.lastIndexOf('.');
+            if ((dot > -1) && (dot < (filename.length()))) {
+                return filename.substring(0, dot);
+            }
+        }
+        return filename;
+    }
+
+    /**
+     * 获取文件扩展名，不带 .
+     */
+    public static String getExtensionName(String filename) {
+        if ((filename != null) && (filename.length() > 0)) {
+            int dot = filename.lastIndexOf('.');
+            if ((dot > -1) && (dot < (filename.length() - 1))) {
+                return filename.substring(dot + 1);
+            }
+        }
+        return filename;
+    }
+
+    /**
+     * 文件大小转换
+     */
+    public static String getSize(long size) {
+        String resultSize;
+        if (size / GB >= 1) {
+            //如果当前Byte的值大于等于1GB
+            resultSize = DF.format(size / (float) GB) + "GB   ";
+        } else if (size / MB >= 1) {
+            //如果当前Byte的值大于等于1MB
+            resultSize = DF.format(size / (float) MB) + "MB   ";
+        } else if (size / KB >= 1) {
+            //如果当前Byte的值大于等于1KB
+            resultSize = DF.format(size / (float) KB) + "KB   ";
+        } else {
+            resultSize = size + "B   ";
+        }
+        return resultSize;
+    }
+
+    public static void checkSize(long maxSize, long size) {
+        // 1M
+        int len = 1024 * 1024;
+        if (size > (maxSize * len)) {
+            throw new UtilException("文件超出规定大小:" + maxSize + "MB");
+        }
     }
 }

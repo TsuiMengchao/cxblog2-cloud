@@ -17,8 +17,10 @@ import java.util.List;
 public class ApiCommentListVO {
     @ApiModelProperty(value = "主键id")
     private Integer id;
+
     @ApiModelProperty(value = "发表用户id")
     private String userId;
+
     @ApiModelProperty(value = "评论用户id")
     private String replyUserId;
 

@@ -9,38 +9,6 @@
           @keyup.enter="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="用户头像地址" prop="avatar">
-        <el-input
-          v-model="queryParams.avatar"
-          placeholder="请输入用户头像地址"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="IP地址" prop="ipAddress">
-        <el-input
-          v-model="queryParams.ipAddress"
-          placeholder="请输入IP地址"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="IP来源" prop="ipSource">
-        <el-input
-          v-model="queryParams.ipSource"
-          placeholder="请输入IP来源"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="时间" prop="time">
-        <el-input
-          v-model="queryParams.time"
-          placeholder="请输入时间"
-          clearable
-          @keyup.enter="handleQuery"
-        />
-      </el-form-item>
       <el-form-item>
         <el-button type="primary" icon="Search" @click="handleQuery">搜索</el-button>
         <el-button icon="Refresh" @click="resetQuery">重置</el-button>
@@ -94,11 +62,23 @@
       <el-table-column label="ID" align="center" prop="id" />
       <el-table-column label="内容" align="center" prop="content" />
       <el-table-column label="用户昵称" align="center" prop="nickname" />
-      <el-table-column label="用户头像地址" align="center" prop="avatar" />
+      <el-table-column label="用户头像地址" align="center" prop="avatar" width="100">
+        <template #default="scope">
+          <image-preview :src="scope.row.avatar" :width="50" :height="50"/>
+        </template>
+      </el-table-column>
       <el-table-column label="IP地址" align="center" prop="ipAddress" />
       <el-table-column label="IP来源" align="center" prop="ipSource" />
-      <el-table-column label="时间" align="center" prop="time" />
-      <el-table-column label="状态 0:审核  1：正常" align="center" prop="status" />
+      <el-table-column label="状态" align="center" prop="status">
+        <template #default="scope">
+          <dict-tag :options="blog_publish_status" :value="scope.row.status"/>
+        </template>
+      </el-table-column>
+      <el-table-column label="创建时间" align="center" prop="createTime" width="180">
+        <template #default="scope">
+          <span>{{ parseTime(scope.row.createTime, '{y}-{m}-{d}') }}</span>
+        </template>
+      </el-table-column>
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
         <template #default="scope">
@@ -122,23 +102,14 @@
         <el-form-item label="内容">
           <editor v-model="form.content" :min-height="192"/>
         </el-form-item>
-        <el-form-item label="用户昵称" prop="nickname">
-          <el-input v-model="form.nickname" placeholder="请输入用户昵称" />
-        </el-form-item>
-        <el-form-item label="用户头像地址" prop="avatar">
-          <el-input v-model="form.avatar" placeholder="请输入用户头像地址" />
-        </el-form-item>
-        <el-form-item label="IP地址" prop="ipAddress">
-          <el-input v-model="form.ipAddress" placeholder="请输入IP地址" />
-        </el-form-item>
-        <el-form-item label="IP来源" prop="ipSource">
-          <el-input v-model="form.ipSource" placeholder="请输入IP来源" />
-        </el-form-item>
-        <el-form-item label="时间" prop="time">
-          <el-input v-model="form.time" placeholder="请输入时间" />
-        </el-form-item>
-        <el-form-item label="备注" prop="remark">
-          <el-input v-model="form.remark" type="textarea" placeholder="请输入内容" />
+        <el-form-item label="状态" prop="status">
+          <el-radio-group v-model="form.status">
+            <el-radio
+              v-for="dict in blog_publish_status"
+              :key="dict.value"
+              :label="parseInt(dict.value)"
+            >{{dict.label}}</el-radio>
+          </el-radio-group>
         </el-form-item>
       </el-form>
       <template #footer>
@@ -155,6 +126,7 @@
 import { listMessage, getMessage, delMessage, addMessage, updateMessage } from "@/api/blog/message";
 
 const { proxy } = getCurrentInstance();
+const { blog_publish_status } = proxy.useDict('blog_publish_status');
 
 const messageList = ref([]);
 const open = ref(false);
@@ -171,13 +143,7 @@ const data = reactive({
   queryParams: {
     pageNum: 1,
     pageSize: 10,
-    content: null,
     nickname: null,
-    avatar: null,
-    ipAddress: null,
-    ipSource: null,
-    time: null,
-    status: null,
   },
   rules: {
     content: [

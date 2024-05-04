@@ -46,6 +46,10 @@ import DictTag from '@/components/DictTag'
 
 const app = createApp(App)
 
+import mavonEditor from "mavon-editor";
+import "mavon-editor/dist/css/index.css";
+app.use(mavonEditor);
+
 // 全局方法挂载
 app.config.globalProperties.useDict = useDict
 app.config.globalProperties.download = download

@@ -3,7 +3,7 @@ import request from '@/utils/request'
 // 聊天室接口
 export function getImHistory(params) {
     return request({
-        url: '/api/v1/im/',
+        url: '/api/v1/im',
         method: 'get',
         params: params
     })

@@ -45,12 +45,12 @@
     <select id="selectInfoByUserIdNew" resultType="me.mcx.blog.domain.vo.user.UserInfoVO">
         SELECT
             u.user_id as id,
-            uui.user_info_id,
+            uui.user_info_id as userInfoId,
             ui.nickname,
             ui.avatar,
             ui.intro,
-            ui.web_site,
-            ui.bj_cover
+            ui.web_site as webSite,
+            ui.bj_cover as bjCover
         FROM
             `cxblog-cloud`.sys_user u
                 LEFT JOIN blog_user_userinfo uui ON uui.user_id = u.user_id

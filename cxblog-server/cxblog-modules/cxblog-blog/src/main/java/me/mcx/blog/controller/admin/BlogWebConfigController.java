@@ -2,6 +2,8 @@ package me.mcx.blog.controller.admin;
 
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
+
+import me.mcx.blog.service.common.WebConfigService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -33,6 +35,9 @@ public class BlogWebConfigController extends BaseController
 {
     @Autowired
     private IBlogWebConfigService blogWebConfigService;
+
+    @Autowired
+    private WebConfigService webConfigService;
 
     /**
      * 查询网站配置列表
@@ -100,5 +105,27 @@ public class BlogWebConfigController extends BaseController
     public AjaxResult remove(@PathVariable Long[] ids)
     {
         return toAjax(blogWebConfigService.deleteBlogWebConfigByIds(ids));
+    }
+
+    // new
+
+    /**
+     * 网站配置列表
+     * @return
+     */
+    @GetMapping
+    public AjaxResult getWebConfig() {
+        return webConfigService.getWebConfig();
+    }
+
+    /**
+     * 修改网站配置
+     * @param webConfig
+     * @return
+     */
+    @PutMapping(value = "/update")
+    @RequiresPermissions("blog:webConfig:update")
+    public AjaxResult updateWebConfig(@RequestBody BlogWebConfig webConfig) {
+        return webConfigService.updateWebConfig(webConfig);
     }
 }

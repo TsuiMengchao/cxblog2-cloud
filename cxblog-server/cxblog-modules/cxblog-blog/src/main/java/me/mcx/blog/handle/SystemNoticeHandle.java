@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import me.mcx.blog.domain.BlogImMessage;
 import me.mcx.blog.mapper.BlogImMessageMapper;
 import me.mcx.blog.mapper.web.ImMessageMapper;
-import me.mcx.common.core.context.SecurityContextHolder;
+import me.mcx.common.security.utils.SecurityUtils;
 import me.mcx.common.core.utils.ip.IpUtils;
 
 
@@ -26,7 +26,7 @@ public class SystemNoticeHandle {
             String ip = IpUtils.getIpAddr();
 
             BlogImMessage message = new BlogImMessage(){{
-                setFromUserId(SecurityContextHolder.getLoginIdAsString());
+                setFromUserId(SecurityUtils.getLoginIdAsString());
                 setToUserId(toUserId);
                 setCommentMark(Long.valueOf(commentMark));
                 setNoticeType(Long.valueOf(noticeType));
