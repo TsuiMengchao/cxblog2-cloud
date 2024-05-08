@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="me.mcx.file.mapper.FileLocalConfigMapper">
+    
+    <resultMap type="FileLocalConfig" id="FileLocalConfigResult">
+        <result property="configId"    column="config_id"    />
+        <result property="localFileUrl"    column="local_file_url"    />
+    </resultMap>
+
+    <sql id="selectFileLocalConfigVo">
+        select config_id, local_file_url from file_local_config
+    </sql>
+
+    <select id="selectFileLocalConfigList" parameterType="FileLocalConfig" resultMap="FileLocalConfigResult">
+        <include refid="selectFileLocalConfigVo"/>
+        <where>  
+            <if test="localFileUrl != null  and localFileUrl != ''"> and local_file_url = #{localFileUrl}</if>
+        </where>
+    </select>
+    
+    <select id="selectFileLocalConfigByConfigId" parameterType="Long" resultMap="FileLocalConfigResult">
+        <include refid="selectFileLocalConfigVo"/>
+        where config_id = #{configId}
+    </select>
+        
+    <insert id="insertFileLocalConfig" parameterType="FileLocalConfig">
+        insert into file_local_config
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="configId != null">config_id,</if>
+            <if test="localFileUrl != null and localFileUrl != ''">local_file_url,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="configId != null">#{configId},</if>
+            <if test="localFileUrl != null and localFileUrl != ''">#{localFileUrl},</if>
+         </trim>
+    </insert>
+
+    <update id="updateFileLocalConfig" parameterType="FileLocalConfig">
+        update file_local_config
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="localFileUrl != null and localFileUrl != ''">local_file_url = #{localFileUrl},</if>
+        </trim>
+        where config_id = #{configId}
+    </update>
+
+    <delete id="deleteFileLocalConfigByConfigId" parameterType="Long">
+        delete from file_local_config where config_id = #{configId}
+    </delete>
+
+    <delete id="deleteFileLocalConfigByConfigIds" parameterType="String">
+        delete from file_local_config where config_id in 
+        <foreach item="configId" collection="array" open="(" separator="," close=")">
+            #{configId}
+        </foreach>
+    </delete>
+</mapper>
