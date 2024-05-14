@@ -4,6 +4,8 @@ import java.util.List;
 
 import me.mcx.blog.domain.BlogArticleComment;
 import me.mcx.blog.domain.BlogImMessage;
+import me.mcx.blog.domain.vo.message.ImMessageVO;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 即时消息Mapper接口
@@ -62,4 +64,31 @@ public interface BlogImMessageMapper
     public int deleteBlogImMessageByIds(String[] ids);
 
     Integer selectBlogImMessageCount(BlogImMessage blogImMessage);
+
+//    ======================================
+
+    /**
+     * 获取历史聊天记录
+     * @return
+     */
+    List<ImMessageVO> selectPublicHistoryList();
+
+    /**
+     * 获取单聊历史聊天记录
+     * @return
+     */
+    List<ImMessageVO> selectPublicUserImHistoryList(@Param("fromUserId") String fromUserId, @Param("toUserId")String toUserId);
+
+    int selectListReadByUserId(@Param("toUserId") String toUserId, @Param("fromUserId")String fromUserId);
+
+    /**
+     * 已读消息
+     * @param userId
+     * @param loginIdAsString
+     */
+    void updateRead(@Param("fromUserId") String userId, @Param("toUserId") String loginIdAsString);
+
+    List<ImMessageVO> getMessageNotice(@Param("userId")String userId
+            , @Param("noticeType")Integer noticeType);
+
 }

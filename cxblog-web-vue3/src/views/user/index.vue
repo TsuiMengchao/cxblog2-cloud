@@ -586,12 +586,13 @@ function uploadBjCoverFile(param) {
   // FormData 对象
   var formData = new FormData();
   // 文件对象
-  formData.append("multipartFile", files.value);
+  formData.append("file", files.value);
+  formData.append("path", "avatar.cover");
   upload(formData)
     .then((res) => {
       let obj = {
         id: user.value.id,
-        bjCover: res.data,
+        bjCover: res.data.url,
       };
       updateUserInfo(obj)
         .then((ress) => {
@@ -615,10 +616,11 @@ function uploadSectionFile(param) {
   // FormData 对象
   var formData = new FormData();
   // 文件对象
-  formData.append("multipartFile", files.value);
+  formData.append("file", files.value);
+  formData.append("path", "avatar");
   upload(formData)
     .then((res) => {
-      form.value.avatar = res.data;
+      form.value.avatar = res.data.url;
       closeLoading();
     })
     .catch((err) => {

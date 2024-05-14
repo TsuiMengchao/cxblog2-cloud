@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.util.Objects;
+
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.web.multipart.MultipartFile;
 import me.mcx.common.core.exception.file.FileException;
@@ -21,6 +23,7 @@ import me.mcx.common.core.utils.uuid.Seq;
  * 
  * @author cxblog
  */
+@Slf4j
 public class FileUploadUtils
 {
     /**
@@ -93,8 +96,7 @@ public class FileUploadUtils
      */
     public static final String extractFilename(MultipartFile file)
     {
-        return StringUtils.format("{}/{}_{}.{}", DateUtils.datePath(),
-                FilenameUtils.getBaseName(file.getOriginalFilename()), Seq.getId(Seq.uploadSeqType), FileTypeUtils.getExtension(file));
+        return StringUtils.format("{}_{}.{}", FilenameUtils.getBaseName(file.getOriginalFilename()), Seq.getId(Seq.uploadSeqType), FileTypeUtils.getExtension(file));
     }
 
     private static final File getAbsoluteFile(String uploadDir, String fileName) throws IOException

@@ -2,7 +2,7 @@ package me.mcx.blog.controller.web;
 
 import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
-import me.mcx.blog.annotation.AccessLimit;
+import me.mcx.common.security.annotation.AccessLimit;
 import me.mcx.blog.service.web.ApiArticleCollectService;
 import me.mcx.common.core.web.controller.BaseController;
 import me.mcx.common.core.web.domain.AjaxResult;

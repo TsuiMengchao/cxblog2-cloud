@@ -1,11 +1,10 @@
 package me.mcx.auth.controller;
 
 import javax.servlet.http.HttpServletRequest;
+
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import me.mcx.auth.form.LoginBody;
 import me.mcx.auth.form.RegisterBody;
 import me.mcx.auth.service.SysLoginService;
@@ -72,7 +71,14 @@ public class TokenController
     public R<?> register(@RequestBody RegisterBody registerBody)
     {
         // 用户注册
-        sysLoginService.register(registerBody.getUsername(), registerBody.getPassword());
+        sysLoginService.register(registerBody);
+        return R.ok();
+    }
+
+    @ApiOperation(value = "发送邮箱验证码", httpMethod = "GET", response = R.class, notes = "发送邮箱验证码")
+    @GetMapping("sendEmailCode")
+    public R<?> sendEmailCode(String email) {
+        sysLoginService.sendEmailCode(email);
         return R.ok();
     }
 }

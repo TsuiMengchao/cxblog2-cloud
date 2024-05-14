@@ -18,7 +18,7 @@ public class ApiUserController {
      * @param userId
      * @return
      */
-    @RequestMapping(value = "/info",method = RequestMethod.GET)
+    @GetMapping(value = "/info")
     public AjaxResult selectUserInfo(String userId){
         return userService.selectUserInfo(userId);
     }
@@ -28,7 +28,7 @@ public class ApiUserController {
      * @param vo
      * @return
      */
-    @GetMapping
+    @PutMapping
     public AjaxResult updateUser(@RequestBody UserInfoDTO vo){
         return userService.updateUser(vo);
     }
@@ -38,7 +38,7 @@ public class ApiUserController {
      * @param token
      * @return
      */
-    @RequestMapping(value = "/selectUserInfoByToken",method = RequestMethod.GET)
+    @GetMapping(value = "/selectUserInfoByToken")
     public AjaxResult selectUserInfoByToken(String token){
         return userService.selectUserInfoByToken(token);
     }
@@ -48,7 +48,7 @@ public class ApiUserController {
      * @param id
      * @return
      */
-    @RequestMapping(value = "/getUserCount",method = RequestMethod.GET)
+    @GetMapping(value = "/getUserCount")
     public AjaxResult getUserCount(String id){
         return userService.getUserCount(id);
     }

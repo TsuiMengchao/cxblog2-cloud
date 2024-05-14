@@ -417,17 +417,20 @@ function uploadSectionFile(param) {
       }
       const blob = new Blob(byteArrays, { type: "image/jpeg" });
       formData.append("images[]", blob, "image" + i + ".jpg"); // 根据实际的文件名进行调整
-      formData.append("multipartFile", blob, Date.now() + ".jpg");
+      formData.append("file", blob, Date.now() + ".jpg");
+      formData.append("path", "file.img.upload.chat");
+
     }
   } else {
     files.value = param.file;
-    formData.append("multipartFile", files.value);
+    formData.append("file", files.value);
+    formData.append("path", "file.img.upload.chat");
   }
 
   upload(formData)
     .then((res) => {
       //上传之后发送消息
-      let content = `<img src="${res.data}" alt="" class="messageImg" style="width: 150px;height: 150px;">`;
+      let content = `<img src="${res.data.url}" alt="" class="messageImg" style="width: 150px;height: 150px;">`;
       doSend(content, 2);
       imgDialogVisible.value = false;
     })

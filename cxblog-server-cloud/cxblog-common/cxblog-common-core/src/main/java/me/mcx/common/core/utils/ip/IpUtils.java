@@ -3,8 +3,14 @@ package me.mcx.common.core.utils.ip;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import javax.servlet.http.HttpServletRequest;
+
+import cn.hutool.http.useragent.UserAgent;
+import cn.hutool.http.useragent.UserAgentUtil;
 import me.mcx.common.core.utils.ServletUtils;
+import me.mcx.common.core.utils.SpringUtils;
 import me.mcx.common.core.utils.StringUtils;
+import net.dreamlu.mica.ip2region.core.Ip2regionSearcher;
+import net.dreamlu.mica.ip2region.core.IpInfo;
 
 /**
  * 获取IP方法
@@ -20,6 +26,10 @@ public class IpUtils
     // 匹配网段
     public final static String REGX_IP_SEG = "(" + REGX_IP + "\\-" + REGX_IP + ")";
 
+    /**
+     * 注入bean
+     */
+    private final static Ip2regionSearcher IP_SEARCHER = SpringUtils.getBean(Ip2regionSearcher.class);
     /**
      * 获取客户端IP
      * 
@@ -378,5 +388,39 @@ public class IpUtils
             }
         }
         return false;
+    }
+
+    /**
+     * 根据ip获取详细地址
+     */
+    public static String getCityInfo() {
+        return getCityInfo(getIpAddr());
+    }
+
+    /**
+     * 根据ip获取详细地址
+     */
+    public static String getCityInfo(String ip) {
+        IpInfo ipInfo = IP_SEARCHER.memorySearch(ip);
+        if(ipInfo != null){
+            return ipInfo.getAddress();
+        }
+        return null;
+    }
+
+    /**
+     * 获取客户端名称
+     *
+     * @return IP地址
+     */
+    public static String getBrowser()
+    {
+        return getBrowser(ServletUtils.getRequest());
+    }
+
+    public static String getBrowser(HttpServletRequest request) {
+        UserAgent ua = UserAgentUtil.parse(request.getHeader("User-Agent"));
+        String browser = ua.getBrowser().toString() + " " + ua.getVersion();
+        return browser.replace(".0.0.0","");
     }
 }

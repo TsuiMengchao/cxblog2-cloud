@@ -2,6 +2,7 @@ package me.mcx.blog.mapper;
 
 import java.util.List;
 import me.mcx.blog.domain.BlogSay;
+import me.mcx.blog.domain.vo.say.ApiSayVO;
 
 /**
  * 说说Mapper接口
@@ -58,4 +59,6 @@ public interface BlogSayMapper
      * @return 结果
      */
     public int deleteBlogSayByIds(String[] ids);
+
+    List<ApiSayVO> selectPublicSayList(boolean showPrivate);
 }

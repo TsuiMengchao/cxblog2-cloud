@@ -1,23 +1,29 @@
 package me.mcx.blog.service.web.impl;
 
-import me.mcx.blog.common.RedisConstants;
+import lombok.extern.slf4j.Slf4j;
 import me.mcx.blog.common.ResultCode;
 import me.mcx.blog.domain.BlogSay;
 import me.mcx.blog.domain.BlogSayComment;
 import me.mcx.blog.domain.vo.say.ApiSayCommentVO;
 import me.mcx.blog.domain.vo.say.ApiSayVO;
-import me.mcx.blog.domain.vo.user.UserInfoVO;
 import me.mcx.blog.handle.RelativeDateFormat;
+import me.mcx.blog.handle.SystemNoticeHandle;
+import me.mcx.blog.im.MessageConstant;
 import me.mcx.blog.mapper.BlogSayCommentMapper;
 import me.mcx.blog.mapper.BlogSayMapper;
-import me.mcx.blog.mapper.web.SayMapper;
-import me.mcx.blog.mapper.web.UserMapper;
 import me.mcx.blog.service.web.ApiSayService;
 import me.mcx.blog.service.common.RedisService;
+import me.mcx.common.core.constant.RedisConstants;
+import me.mcx.common.core.constant.SecurityConstants;
+import me.mcx.common.core.domain.R;
 import me.mcx.common.security.utils.SecurityUtils;
 import me.mcx.common.core.exception.ServiceException;
 import me.mcx.common.core.web.domain.AjaxResult;
 import me.mcx.common.security.auth.AuthUtil;
+import me.mcx.system.api.RemoteUserInfoService;
+import me.mcx.system.api.RemoteUserService;
+import me.mcx.system.api.model.user.UserInfoVO;
+import me.mcx.system.api.model.user.UserVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,10 +35,11 @@ import java.util.Set;
 
 
 @Service
+@Slf4j
 public class ApiSayServiceImpl implements ApiSayService {
 
     @Autowired
-    private SayMapper sayMapper;
+    private BlogSayMapper sayMapper;
 
     @Autowired
     private BlogSayMapper blogSayMapper;
@@ -41,7 +48,10 @@ public class ApiSayServiceImpl implements ApiSayService {
     private RedisService redisService;
 
     @Autowired
-    private UserMapper userMapper;
+    private RemoteUserInfoService remoteUserInfoService;
+
+    @Autowired
+    private RemoteUserService remoteUserService;
 
     @Autowired
     private BlogSayCommentMapper sayCommentMapper;
@@ -55,11 +65,17 @@ public class ApiSayServiceImpl implements ApiSayService {
 
         List<ApiSayVO> sayPage = sayMapper.selectPublicSayList(showPrivate);
         for (ApiSayVO item : sayPage) {
+            // 获取用户信息
+            R<UserVO> userResult = remoteUserService.getUserVO(Long.valueOf(item.getUserId()), SecurityConstants.INNER);
+            UserVO user = userResult.getData();
+            item.setAvatar(user.getAvatar());
+            item.setNickname(user.getNickName());
+
             //获取点赞用户信息
             Set<Object> userIdList = redisService.getCacheSet(RedisConstants.SAY_LIKE_KEY + item.getId());
             List<UserInfoVO> likeUserList = new ArrayList<>();
             for (Object userId : userIdList) {
-                UserInfoVO userInfoVO = userMapper.selectInfoByUserIdTwo(userId);
+                UserInfoVO userInfoVO = remoteUserInfoService.selectInfoByUserIdTwo(userId, SecurityConstants.INNER).getData();
                 likeUserList.add(userInfoVO);
             }
             item.setCreateTimeStr(RelativeDateFormat.format(item.getCreateTime()));
@@ -71,11 +87,11 @@ public class ApiSayServiceImpl implements ApiSayService {
             List<BlogSayComment> sayComments = sayCommentMapper.selectBlogSayCommentList(new BlogSayComment() {{setSayId(item.getId());}});
             List<ApiSayCommentVO> sayCommentVOList = new ArrayList<>();
             for (BlogSayComment sayComment : sayComments) {
-                UserInfoVO userInfoVO = userMapper.selectInfoByUserIdTwo(sayComment.getUserId());
+                UserInfoVO userInfoVO = remoteUserInfoService.selectInfoByUserIdTwo(sayComment.getUserId(), SecurityConstants.INNER).getData();
                 ApiSayCommentVO apiSayCommentVO = ApiSayCommentVO.builder().userId(sayComment.getUserId()).nickname(userInfoVO.getNickname()).replyUserId(sayComment.getReplyUserId())
                         .content(sayComment.getContent()).ipAddress(sayComment.getIpAddress()).createTime(sayComment.getCreateTime()).build();
                 if (StringUtils.isNotBlank(sayComment.getReplyUserId())) {
-                    userInfoVO = userMapper.selectInfoByUserIdTwo(sayComment.getReplyUserId());
+                    userInfoVO = remoteUserInfoService.selectInfoByUserIdTwo(sayComment.getReplyUserId(), SecurityConstants.INNER).getData();
                     apiSayCommentVO.setReplyUserNickname(userInfoVO.getNickname());
                 }
                 sayCommentVOList.add(apiSayCommentVO);
@@ -104,8 +120,8 @@ public class ApiSayServiceImpl implements ApiSayService {
             redisService.sAdd(sayLike, userId);
 
             //构建通知消息
-//            Article article = articleMapper.selectById(articleId);
-//            SystemNoticeHandle.sendNotice(article.getUserId(), MessageConstant.MESSAGE_LIKE_NOTICE,MessageConstant.SYSTEM_MESSAGE_CODE,articleId,null,null);
+            BlogSay say = blogSayMapper.selectBlogSayById(sayId);
+            SystemNoticeHandle.sendNotice(say.getUserId(), MessageConstant.MESSAGE_LIKE_NOTICE,MessageConstant.SYSTEM_MESSAGE_CODE, Integer.valueOf(sayId),null,null);
         return AjaxResult.success("点赞成功");
     }
 

@@ -5,7 +5,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import me.mcx.blog.domain.dto.article.ArticleDTO;
 import me.mcx.blog.domain.vo.article.SystemArticleListVO;
-import me.mcx.blog.service.common.ArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,7 +18,7 @@ import me.mcx.common.log.annotation.Log;
 import me.mcx.common.log.enums.BusinessType;
 import me.mcx.common.security.annotation.RequiresPermissions;
 import me.mcx.blog.domain.BlogArticle;
-import me.mcx.blog.service.IBlogArticleService;
+import me.mcx.blog.service.admin.IBlogArticleService;
 import me.mcx.common.core.web.controller.BaseController;
 import me.mcx.common.core.web.domain.AjaxResult;
 import me.mcx.common.core.utils.poi.ExcelUtil;
@@ -39,7 +38,7 @@ public class BlogArticleController extends BaseController
     private IBlogArticleService blogArticleService;
 
     @Autowired
-    private ArticleService articleService;
+    private IBlogArticleService articleService;
 
     /**
      * 查询博客文章列表
@@ -82,9 +81,9 @@ public class BlogArticleController extends BaseController
     @RequiresPermissions("blog:article:add")
     @Log(title = "博客文章", businessType = BusinessType.INSERT)
     @PostMapping
-    public AjaxResult add(@RequestBody BlogArticle blogArticle)
+    public AjaxResult add(@RequestBody ArticleDTO blogArticle)
     {
-        return toAjax(blogArticleService.insertBlogArticle(blogArticle));
+        return toAjax(blogArticleService.addArticle(blogArticle));
     }
 
     /**
@@ -93,9 +92,9 @@ public class BlogArticleController extends BaseController
     @RequiresPermissions("blog:article:edit")
     @Log(title = "博客文章", businessType = BusinessType.UPDATE)
     @PutMapping
-    public AjaxResult edit(@RequestBody BlogArticle blogArticle)
+    public AjaxResult edit(@RequestBody ArticleDTO blogArticle)
     {
-        return toAjax(blogArticleService.updateBlogArticle(blogArticle));
+        return toAjax(blogArticleService.updateArticle(blogArticle));
     }
 
     /**

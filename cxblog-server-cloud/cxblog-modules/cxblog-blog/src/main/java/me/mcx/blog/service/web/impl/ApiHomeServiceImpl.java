@@ -3,15 +3,15 @@ package me.mcx.blog.service.web.impl;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
-import me.mcx.blog.common.RedisConstants;
 import me.mcx.blog.domain.BlogTags;
 import me.mcx.blog.domain.BlogWebConfig;
+import me.mcx.blog.mapper.BlogArticleMapper;
 import me.mcx.blog.mapper.BlogTagsMapper;
 import me.mcx.blog.mapper.BlogWebConfigMapper;
-import me.mcx.blog.mapper.web.ArticleMapper;
 import me.mcx.blog.service.web.ApiHomeService;
 import me.mcx.blog.service.common.RedisService;
 import me.mcx.blog.util.CustomHttpUtil;
+import me.mcx.common.core.constant.RedisConstants;
 import me.mcx.common.core.utils.ip.IpUtils;
 import me.mcx.blog.domain.vo.article.ApiArticleListVO;
 import me.mcx.blog.domain.vo.article.SystemArticleListVO;
@@ -35,7 +35,7 @@ public class ApiHomeServiceImpl implements ApiHomeService {
     private BlogWebConfigMapper webConfigMapper;
 
     @Autowired
-    private ArticleMapper articleMapper;
+    private BlogArticleMapper articleMapper;
 
     @Autowired
     private BlogTagsMapper tagsMapper;

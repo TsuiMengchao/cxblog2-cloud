@@ -171,4 +171,213 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="keywords != null  and keywords != ''"> and keywords = #{keywords}</if>
         </where>
     </select>
+
+<!--    =======================================-->
+    <resultMap id="selectArticleByIdToVOMap" type="me.mcx.blog.domain.vo.article.ApiArticleInfoVO">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_Id" jdbcType="VARCHAR" property="userId"/>
+        <result column="nickname" jdbcType="VARCHAR" property="nickname"/>
+        <result column="avatar" jdbcType="VARCHAR" property="avatar"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="summary" jdbcType="VARCHAR" property="summary"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="content_md" jdbcType="INTEGER" property="contentMd"/>
+        <result column="is_original" jdbcType="INTEGER" property="isOriginal"/>
+        <result column="original_url" jdbcType="VARCHAR" property="originalUrl"/>
+        <result column="keywords" jdbcType="VARCHAR" property="keywords"/>
+        <result column="address" jdbcType="VARCHAR" property="address"/>
+        <result column="is_publish" jdbcType="INTEGER" property="isPublish"/>
+        <result column="quantity" jdbcType="INTEGER" property="quantity"/>
+        <result column="create_time" jdbcType="DATE" property="createTime"/>
+        <result column="update_time" jdbcType="VARCHAR" property="updateTime"/>
+        <result column="read_type" jdbcType="INTEGER" property="readType"/>
+        <association property="category" javaType="me.mcx.blog.domain.BlogCategory">
+            <id property="id" column="cid" jdbcType="BIGINT"></id>
+            <result property="name" column="cname" jdbcType="VARCHAR"></result>
+        </association>
+    </resultMap>
+
+    <resultMap id="selectArticleToVOMap" type="me.mcx.blog.domain.vo.article.SystemArticleListVO">
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_Id" jdbcType="VARCHAR" property="userId"/>
+        <result column="title" jdbcType="VARCHAR" property="title"/>
+        <result column="is_original" jdbcType="INTEGER" property="isOriginal"/>
+        <result column="is_publish" jdbcType="INTEGER" property="isPublish"/>
+        <result column="quantity" jdbcType="INTEGER" property="quantity"/>
+        <result column="create_time" jdbcType="DATE" property="createTime"/>
+        <result column="read_type" jdbcType="INTEGER" property="readType"/>
+        <result property="categoryName" column="name" jdbcType="VARCHAR"/>
+        <result property="nickname" column="nick_name" jdbcType="VARCHAR"/>
+        <result property="isStick" column="is_stick" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="selectArticle" resultMap="selectArticleToVOMap">
+        SELECT
+        a.*,
+        b.name,
+        group_concat( t.NAME SEPARATOR ',' ) AS tagNames
+        FROM
+        blog_article a
+        JOIN blog_category b ON a.category_id = b.id
+        JOIN blog_article_tag atg ON a.id = atg.article_id
+        JOIN blog_tags t ON atg.tag_id = t.id
+        <where>
+            <if test="title != null and title != ''">
+                a.title like concat('%',#{title},'%')
+            </if>
+            <if test="categoryId != null and categoryId != ''">
+                and a.category_id=#{categoryId}
+            </if>
+            <if test="isPublish != null and isPublish != ''">
+                and a.is_publish=#{isPublish}
+            </if>
+            <if test="tagId != null and tagId != ''">
+                and atg.tag_id=#{tagId}
+            </if>
+        </where>
+        GROUP BY a.id order by a.is_stick desc ,a.create_time desc
+    </select>
+
+    <select id="selectArticlePrimaryKey" resultType="me.mcx.blog.domain.dto.article.ArticleDTO">
+        select a.id,
+               a.title,
+               a.avatar,
+               a.summary,
+               a.quantity,
+               a.content,
+               a.content_md as contentMd,
+               a.read_type as readType,
+               a.is_stick as isStick,
+               a.is_publish as isPublish,
+               a.is_original as isOriginal,
+               a.original_url as originalUrl,
+               a.create_time as createTime,
+               b.name as categoryName,
+               a.is_carousel as isCarousel,
+               a.keywords,
+               a.is_recommend as isRecommend
+        from blog_article a
+                 LEFT JOIN (SELECT id, name from blog_category) b on a.category_id = b.id
+        where a.id = #{id}
+    </select>
+
+    <select id="contribute" resultType="me.mcx.blog.domain.vo.article.SystemArticleContributeVO">
+        select count, date
+        from
+            (SELECT
+            count(id) as 'count', DATE(create_time) as date
+            FROM
+            `blog_article`
+            where DATE_FORMAT(create_time, '%Y-%m-%d') between #{lastTime} and #{nowTime}
+            GROUP BY DATE(create_time)) AS blog
+        ORDER BY blog.date ASC
+    </select>
+
+
+    <update id="putTopArticle">
+        update blog_article
+        set is_stick = #{article.isStick}
+        where id = #{article.id}
+    </update>
+    <select id="selectSearchArticle" resultType="me.mcx.blog.domain.vo.article.ApiArticleSearchVO">
+        select a.id,
+               a.title,
+               a.summary,
+               a.is_stick,
+               a.create_time
+        from blog_article a
+        where LOWER(a.title) like concat('%', #{keywords}, '%') and a.is_publish = 1 order by a.create_time desc
+    </select>
+
+    <select id="selectPublicArticleList" resultType="me.mcx.blog.domain.vo.article.ApiArticleListVO">
+        select a.id, a.title, a.avatar,a.summary,a.quantity,a.is_stick,a.is_original,a.user_id,c.id as categoryId,c.name as categoryName,
+        a.create_time, a.user_id
+        from blog_article a
+        left join blog_category c on a.category_id = c.id
+        where a.is_publish = 1
+        <if test="categoryId != null and categoryId != 0">
+            and a.category_id = #{categoryId}
+        </if>
+        <if test="tagId != null">
+            and a.id in (select article_id from blog_article_tag where tag_id =#{tagId})
+        </if>
+        order by a.is_stick desc,
+        <choose>
+            <when test="orderByDescColumn != null and orderByDescColumn != ''">
+                a.${orderByDescColumn} desc
+            </when>
+            <otherwise>
+                a.create_time desc
+            </otherwise>
+        </choose>
+    </select>
+
+    <select id="selectListArchive" resultType="me.mcx.blog.domain.vo.article.ApiArchiveVO">
+        select id,
+               title,
+               DATE_FORMAT(create_time, '%Y-%m') as 'time', create_time as formatTime
+        from blog_article where is_publish = 1
+        order by create_time desc
+    </select>
+    <select id="selectArticleByIdToVO" resultMap="selectArticleByIdToVOMap">
+        select a.id,
+               a.user_id,
+               a.title,
+               a.summary,
+               a.content,
+               a.content_md,
+               a.quantity,
+               a.create_time,
+               a.update_time,
+               a.read_type,
+               a.is_original,
+               a.original_url,
+               a.is_publish,
+               a.keywords,
+               a.address,
+               c.id   as cid,
+               c.name as cname
+        from blog_article a
+                 left join blog_category c on a.category_id = c.id
+        where a.id = #{id}
+    </select>
+    <select id="selectListByBanner" resultType="me.mcx.blog.domain.vo.article.SystemArticleListVO">
+        select id, title, avatar
+        from blog_article
+        where is_carousel = 1 and is_publish = 1
+        order by is_stick desc ,create_time desc
+    </select>
+
+    <select id="selectRecommendArticle" resultType="me.mcx.blog.domain.vo.article.ApiArticleListVO">
+        select id, title, avatar,create_time
+        from blog_article where is_recommend = 1
+        order by create_time desc limit 5
+    </select>
+
+    <select id="selectHotArticleList" resultType="me.mcx.blog.domain.vo.article.ApiArticleListVO">
+        select id, title
+        from blog_article where is_publish = 1
+        order by quantity desc limit 5
+    </select>
+    <select id="selectMyArticle" resultType="me.mcx.blog.domain.vo.article.ApiArticleListVO">
+        SELECT
+        a.*,
+        b.NAME AS categoryName,
+        b.id AS categoryId
+        FROM
+        blog_article a
+        left JOIN blog_category b ON a.category_id = b.id
+        where a.user_id =#{userId}
+        <if test="type != null and type != ''">
+            and a.is_publish = #{type}
+        </if>
+        order by a.create_time desc
+    </select>
+    <select id="selectMyArticleInfo" resultType="me.mcx.blog.domain.dto.article.ArticlePostDTO">
+        SELECT
+            *
+        FROM
+            blog_article
+        where id = #{id}
+    </select>
 </mapper>

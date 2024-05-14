@@ -24,7 +24,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @Data
 @Configuration
-@ConfigurationProperties(prefix = "file")
+@ConfigurationProperties(prefix = "local")
 public class FileProperties {
 
     /** 文件大小限制 */
@@ -32,6 +32,9 @@ public class FileProperties {
 
     /** 头像大小限制 */
     private Long avatarMaxSize;
+
+    /** 资源映射路径 前缀 */
+    private String prefix;
 
     private ElPath mac;
 

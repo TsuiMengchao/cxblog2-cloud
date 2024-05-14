@@ -7,7 +7,6 @@ import me.mcx.blog.domain.BlogSign;
 import me.mcx.blog.handle.SystemNoticeHandle;
 import me.mcx.blog.im.MessageConstant;
 import me.mcx.blog.mapper.BlogSignMapper;
-import me.mcx.blog.mapper.web.SignMapper;
 import me.mcx.blog.service.web.ApiSignService;
 import me.mcx.common.core.exception.ServiceException;
 import me.mcx.common.core.utils.DateUtils;
@@ -24,7 +23,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class ApiSignServiceImpl implements ApiSignService {
 
-    private final SignMapper signMapper;
+    private final BlogSignMapper signMapper;
 
     private final BlogSignMapper blogSignMapper;
 

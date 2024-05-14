@@ -3,6 +3,7 @@ package me.mcx.system.api.factory;
 import me.mcx.system.api.RemoteUserService;
 import me.mcx.system.api.domain.SysUser;
 import me.mcx.system.api.model.LoginUser;
+import me.mcx.system.api.model.user.UserVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
@@ -35,6 +36,12 @@ public class RemoteUserFallbackFactory implements FallbackFactory<RemoteUserServ
             public R<Boolean> registerUserInfo(SysUser sysUser, String source)
             {
                 return R.fail("注册用户失败:" + throwable.getMessage());
+            }
+
+            @Override
+            public R<UserVO> getUserVO(Long userId, String source)
+            {
+                return R.fail("获取用户失败:" + throwable.getMessage());
             }
         };
     }

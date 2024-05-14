@@ -5,7 +5,6 @@ import cn.hutool.core.util.ObjectUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.mcx.blog.common.RedisConstants;
 import me.mcx.blog.domain.*;
 import me.mcx.blog.domain.dto.article.ArticlePostDTO;
 import me.mcx.blog.domain.vo.article.ApiArchiveVO;
@@ -17,21 +16,21 @@ import me.mcx.blog.enums.SearchModelEnum;
 import me.mcx.blog.handle.RelativeDateFormat;
 import me.mcx.blog.handle.SystemNoticeHandle;
 import me.mcx.blog.im.MessageConstant;
-import me.mcx.blog.mapper.BlogArticleCollectMapper;
-import me.mcx.blog.mapper.BlogArticleCommentMapper;
-import me.mcx.blog.mapper.BlogArticleMapper;
-import me.mcx.blog.mapper.BlogFollowedMapper;
-import me.mcx.blog.mapper.web.ArticleMapper;
-import me.mcx.blog.mapper.web.TagsMapper;
+import me.mcx.blog.mapper.*;
+import me.mcx.blog.service.admin.IBlogSystemConfigService;
 import me.mcx.blog.service.web.ApiArticleService;
 import me.mcx.blog.service.common.RedisService;
-import me.mcx.blog.service.common.SystemConfigService;
 import me.mcx.blog.strategy.context.SearchStrategyContext;
 import me.mcx.blog.util.BeanCopyUtil;
+import me.mcx.common.core.constant.RedisConstants;
+import me.mcx.common.core.constant.SecurityConstants;
+import me.mcx.common.core.domain.R;
 import me.mcx.common.security.utils.SecurityUtils;
 import me.mcx.common.core.exception.ServiceException;
 import me.mcx.common.core.utils.ip.IpUtils;
 import me.mcx.common.core.web.domain.AjaxResult;
+import me.mcx.system.api.RemoteUserService;
+import me.mcx.system.api.model.user.UserVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,8 +41,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static me.mcx.blog.common.RedisConstants.*;
-import static me.mcx.blog.common.ResultCode.ERROR_EXCEPTION_MOBILE_CODE;
+import static me.mcx.common.core.constant.RedisConstants.*;
 import static me.mcx.blog.common.ResultCode.PARAMS_ILLEGAL;
 
 
@@ -51,18 +49,18 @@ import static me.mcx.blog.common.ResultCode.PARAMS_ILLEGAL;
 @Service
 @RequiredArgsConstructor
 public class ApiArticleServiceImpl implements ApiArticleService {
-
-    private final ArticleMapper articleMapper;
+    private final RemoteUserService remoteUserService;
+    private final BlogArticleMapper articleMapper;
 
     private final BlogArticleMapper blogArticleMapper;
 
     private final RedisService redisService;
 
-    private final TagsMapper tagsMapper;
+    private final BlogTagsMapper tagsMapper;
 
     private final BlogArticleCommentMapper commentMapper;
 
-    private final SystemConfigService systemConfigService;
+    private final BlogSystemConfigMapper blogSystemConfigMapper;
 
     private final BlogArticleCollectMapper collectMapper;
     private final BlogFollowedMapper followedMapper;
@@ -77,6 +75,11 @@ public class ApiArticleServiceImpl implements ApiArticleService {
     public List<ApiArticleListVO> selectArticleList(Integer categoryId, Integer tagId, String orderByDescColumn) {
         List<ApiArticleListVO> articlePage = articleMapper.selectPublicArticleList(categoryId,tagId,orderByDescColumn);
         articlePage.forEach(item ->{
+            R<UserVO> userVOR = remoteUserService.getUserVO(Long.valueOf(item.getUserId()), SecurityConstants.INNER);
+            UserVO user = userVOR.getData();
+            item.setUserAvatar(user.getAvatar());
+            item.setNickname(user.getNickName());
+
             setCommentAndLike(item);
 //            //获取文章
 //            int collectCount = collectMapper.selectCount(new LambdaQueryWrapper<Collect>().eq(Collect::getArticleId, item.getId()));
@@ -103,6 +106,11 @@ public class ApiArticleServiceImpl implements ApiArticleService {
         if (apiArticleInfoVO == null) {
             throw new ServiceException("抱歉，文章不存在");
         }
+        //获取用户信息
+        R<UserVO> userVOR = remoteUserService.getUserVO(Long.valueOf(apiArticleInfoVO.getUserId()), SecurityConstants.INNER);
+        UserVO user = userVOR.getData();
+        apiArticleInfoVO.setAvatar(user.getAvatar());
+        apiArticleInfoVO.setNickname(user.getNickName());
         //获取收藏量
         int collectCount = collectMapper.selectCount(new BlogArticleCollect(){{setArticleId(Long.valueOf(id));}});
         apiArticleInfoVO.setCollectCount(collectCount);
@@ -169,7 +177,7 @@ public class ApiArticleServiceImpl implements ApiArticleService {
             throw new ServiceException(PARAMS_ILLEGAL.getDesc());
         }
         //获取搜索模式（es搜索或mysql搜索）
-        BlogSystemConfig systemConfig = systemConfigService.getCustomizeOne();
+        BlogSystemConfig systemConfig = blogSystemConfigMapper.selectBlogSystemConfigById(1L);
         String strategy = SearchModelEnum.getStrategy(systemConfig.getSearchModel());
         //搜索逻辑
         List<ApiArticleSearchVO> page = searchStrategyContext.executeSearchStrategy(strategy, keywords);
@@ -300,6 +308,11 @@ public class ApiArticleServiceImpl implements ApiArticleService {
         userId = StringUtils.isNotBlank(userId) ? userId : SecurityUtils.getLoginIdAsString();
         List<ApiArticleListVO> list = articleMapper.selectMyArticle(userId,type);
         list.forEach(item ->{
+            R<UserVO> userVOR = remoteUserService.getUserVO(Long.valueOf(item.getUserId()), SecurityConstants.INNER);
+            UserVO user = userVOR.getData();
+            item.setUserAvatar(user.getAvatar());
+            item.setNickname(user.getNickName());
+
             List<BlogTags> tags = tagsMapper.selectTagByArticleId(item.getId());
             item.setTagList(tags);
 
@@ -353,7 +366,7 @@ public class ApiArticleServiceImpl implements ApiArticleService {
         String key = RedisConstants.WECHAT_CODE + code;
         Object redisCode = redisService.getCacheObject(key);
         if (ObjectUtil.isNull(redisCode)) {
-            throw new ServiceException(ERROR_EXCEPTION_MOBILE_CODE.getDesc());
+            throw new ServiceException("验证码不正确或已过期，请重新输入");
         }
 
         //将ip存在redis 有效期一天，当天无需再进行验证码校验

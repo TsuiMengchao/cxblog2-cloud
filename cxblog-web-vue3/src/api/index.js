@@ -173,7 +173,7 @@ export function getWechatLoginCode() {
 }
 export function sendEmailCode(email) {
     return request({
-        url: '/oauth/sendEmailCode',
+        url: '/auth/sendEmailCode',
         method: 'get',
         params: {
             email: email
@@ -182,7 +182,7 @@ export function sendEmailCode(email) {
 }
 export function emailRegister(data) {
     return request({
-        url: '/oauth/emailRegister',
+        url: '/auth/register',
         method: 'post',
         data
     })
@@ -223,7 +223,7 @@ export function getUserCount(id) {
 }
 export function upload(data) {
     return request({
-        url: '/system/file/upload',
+        url: '/file/upload',
         method: 'POST',
         headers: { 'Content-Type': 'multipart/articles-data' },
         data

@@ -255,10 +255,11 @@ function handleInit() {
 //添加图片
 function imgAdd(pos, $file) {
   var formdata = new FormData();
-  formdata.append("multipartFile", $file);
+  formdata.append("file", $file);
+  formdata.append("path", "file.img.upload.article");
   upload(formdata)
     .then((res) => {
-      md.value.$img2Url(pos, res.data);
+      md.value.$img2Url(pos, res.data.url);
     })
     .catch((err) => {
       console.log(err);
@@ -339,13 +340,14 @@ function uploadVideo(param) {
   // FormData 对象
   var formData = new FormData();
   // 文件对象
-  formData.append("multipartFile", files);
+  formData.append("file", files);
+  formData.append("path", "file.video.upload.article");
   upload(formData)
     .then((res) => {
       const $vm = md.value;
       // 将文件名与文件路径插入当前光标位置，这是mavon-editor 内置的方法
       $vm.insertText($vm.getTextareaDom(), {
-        prefix: `<video height=100% width=100% controls autoplay src="${res.data}"></video>`,
+        prefix: `<video height=100% width=100% controls autoplay src="${res.data.url}"></video>`,
         subfix: "",
         str: "",
       });
@@ -357,10 +359,11 @@ function uploadSectionFile(param) {
   // FormData 对象
   var formData = new FormData();
   // 文件对象
-  formData.append("multipartFile", files.value);
+  formData.append("file", files.value);
+  formData.append("path", "file.other.upload.article");
   upload(formData)
     .then((res) => {
-      article.value.avatar = res.data;
+      article.value.avatar = res.data.url;
     }).finally(() => (fullscreenLoading.value = false));
 }
 

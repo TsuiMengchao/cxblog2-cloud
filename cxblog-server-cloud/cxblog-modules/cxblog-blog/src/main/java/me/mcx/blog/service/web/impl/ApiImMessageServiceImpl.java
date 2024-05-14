@@ -7,24 +7,27 @@ import me.mcx.blog.domain.BlogImMessage;
 import me.mcx.blog.domain.BlogImRoom;
 import me.mcx.blog.domain.vo.message.ImMessageVO;
 import me.mcx.blog.domain.vo.message.ImRoomListVO;
-import me.mcx.blog.domain.vo.user.ImOnlineUserVO;
-import me.mcx.blog.domain.vo.user.UserInfoVO;
 import me.mcx.blog.enums.YesOrNoEnum;
 import me.mcx.blog.handle.RelativeDateFormat;
 import me.mcx.blog.im.MessageConstant;
 import me.mcx.blog.im.WebSocketInfoService;
 import me.mcx.blog.mapper.BlogImMessageMapper;
 import me.mcx.blog.mapper.BlogImRoomMapper;
-import me.mcx.blog.mapper.web.ImMessageMapper;
-import me.mcx.blog.mapper.web.ImRoomMapper;
-import me.mcx.blog.mapper.web.UserMapper;
 import me.mcx.blog.service.web.ApiImMessageService;
 import me.mcx.blog.util.BeanCopyUtil;
+import me.mcx.common.core.constant.SecurityConstants;
+import me.mcx.common.core.domain.R;
 import me.mcx.common.core.exception.ServiceException;
 import me.mcx.common.core.utils.DateUtils;
 import me.mcx.common.core.utils.ip.IpUtils;
+import me.mcx.common.core.utils.uuid.IdUtils;
 import me.mcx.common.core.web.domain.AjaxResult;
 import me.mcx.common.security.utils.SecurityUtils;
+import me.mcx.system.api.RemoteUserInfoService;
+import me.mcx.system.api.RemoteUserService;
+import me.mcx.system.api.model.user.ImOnlineUserVO;
+import me.mcx.system.api.model.user.UserInfoVO;
+import me.mcx.system.api.model.user.UserVO;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,15 +53,15 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class ApiImMessageServiceImpl implements ApiImMessageService {
 
-    private final ImMessageMapper imMessageMapper;
+    private final RemoteUserService remoteUserService;
+
+    private final BlogImMessageMapper imMessageMapper;
 
     private final BlogImMessageMapper blogImMessageMapper;
 
-    private final ImRoomMapper imRoomMapper;
-
     private final BlogImRoomMapper blogImRoomMapper;
 
-    private final UserMapper userMapper;
+    private final RemoteUserInfoService remoteUserInfoService;
 
 
     private final WebSocketInfoService webSocketInfoService;
@@ -68,18 +71,40 @@ public class ApiImMessageServiceImpl implements ApiImMessageService {
     @Override
     public List<ImMessageVO> selectHistoryList() {
         List<ImMessageVO> page = imMessageMapper.selectPublicHistoryList();
+        for (ImMessageVO item : page) {
+            R<UserVO> userVOR = remoteUserService.getUserVO(Long.valueOf(item.getFromUserId()), SecurityConstants.INNER);
+            UserVO user = userVOR.getData();
+            item.setFromUserAvatar(user.getAvatar());
+            item.setFromUserNickname(user.getNickName());
+        }
         formatCreateTime(page);
         return page;
     }
 
     @Override
     public List<ImOnlineUserVO> selectOnlineUserList(Set<String> keys) {
-        return imMessageMapper.selectPublicOnlineUserList(keys);
+        List<ImOnlineUserVO> imOnlineUserVOs = new ArrayList<>();
+        for (String id : keys) {
+            R<UserVO> userVOR = remoteUserService.getUserVO(Long.valueOf(id), SecurityConstants.INNER);
+            UserVO user = userVOR.getData();
+            imOnlineUserVOs.add(new ImOnlineUserVO() {{
+                setId(String.valueOf(user.getUserId()));
+                setNickname(user.getNickName());
+                setAvatar(user.getAvatar());
+            }});
+        }
+        return imOnlineUserVOs;
     }
 
     @Override
     public List<ImMessageVO> selectUserImHistoryList(String fromUserId, String toUserId) {
         List<ImMessageVO> page = imMessageMapper.selectPublicUserImHistoryList(fromUserId, toUserId);
+        for (ImMessageVO item : page) {
+            R<UserVO> userVOR = remoteUserService.getUserVO(Long.valueOf(item.getFromUserId()), SecurityConstants.INNER);
+            UserVO user = userVOR.getData();
+            item.setFromUserAvatar(user.getAvatar());
+            item.setFromUserNickname(user.getNickName());
+        }
         formatCreateTime(page);
         return page;
     }
@@ -95,7 +120,7 @@ public class ApiImMessageServiceImpl implements ApiImMessageService {
         List<BlogImRoom> imRooms = blogImRoomMapper.selectBlogImRoomList(new BlogImRoom() {{setFromUserId(SecurityUtils.getLoginIdAsString());}});
         for (BlogImRoom imRoom : imRooms) {
             String toUserId = imRoom.getToUserId();
-            UserInfoVO userInfoVO = userMapper.selectInfoByUserId(toUserId);
+            UserInfoVO userInfoVO = remoteUserInfoService.selectInfoByUserId(toUserId, SecurityConstants.INNER).getData();
             ImRoomListVO vo = ImRoomListVO.builder().id(imRoom.getId()).receiveId(toUserId).nickname(userInfoVO.getNickname())
                     .avatar(userInfoVO.getAvatar()).createTimeStr(RelativeDateFormat.format(imRoom.getCreateTime())).build();
             int readNum = imMessageMapper.selectListReadByUserId(toUserId, SecurityUtils.getLoginIdAsString());
@@ -129,7 +154,7 @@ public class ApiImMessageServiceImpl implements ApiImMessageService {
             setType(1L); setFromUserId(fromUserId); setToUserId(toUserId);
         }};
         blogImRoomMapper.insertBlogImRoom(imRoom);
-        UserInfoVO userInfoVO = userMapper.selectInfoByUserId(toUserId);
+        UserInfoVO userInfoVO = remoteUserInfoService.selectInfoByUserId(toUserId, SecurityConstants.INNER).getData();
         ImRoomListVO vo = ImRoomListVO.builder().id(imRoom.getId()).receiveId(toUserId).nickname(userInfoVO.getNickname())
                 .avatar(userInfoVO.getAvatar()).createTimeStr(RelativeDateFormat.format(imRoom.getCreateTime())).build();
         return AjaxResult.success(vo);
@@ -199,6 +224,7 @@ public class ApiImMessageServiceImpl implements ApiImMessageService {
         obj.setContent(content);
         BlogImMessage imMessage = BeanCopyUtil.copyObject(obj, BlogImMessage.class);
         //保存消息到数据库
+        imMessage.setId(IdUtils.randomUUID());
         blogImMessageMapper.insertBlogImMessage(imMessage);
         //如果是私聊，则发送聊天的同时给发送人创建房间
         if (obj.getCode() == MessageConstant.PRIVATE_CHAT_CODE) {
@@ -261,6 +287,11 @@ public class ApiImMessageServiceImpl implements ApiImMessageService {
     public List<ImMessageVO> getMessageNotice(Integer type) {
         List<ImMessageVO> page = imMessageMapper.getMessageNotice(SecurityUtils.getLoginIdAsString(), type);
         page.forEach(item -> {
+            R<UserVO> userVOR = remoteUserService.getUserVO(Long.valueOf(item.getFromUserId()), SecurityConstants.INNER);
+            UserVO user = userVOR.getData();
+            item.setFromUserAvatar(user.getAvatar());
+            item.setFromUserNickname(user.getNickName());
+
             item.setCreateTimeStr(RelativeDateFormat.format(item.getCreateTime()));
         });
         //修改该类型的所有消息为已读
@@ -331,6 +362,11 @@ public class ApiImMessageServiceImpl implements ApiImMessageService {
     public List<ImMessageVO> getMessageNoticeApplet(Integer type) {
         List<ImMessageVO> page = imMessageMapper.getMessageNotice(SecurityUtils.getLoginIdAsString(), type);
         page.forEach(item -> {
+            R<UserVO> userVOR = remoteUserService.getUserVO(Long.valueOf(item.getFromUserId()), SecurityConstants.INNER);
+            UserVO user = userVOR.getData();
+            item.setFromUserAvatar(user.getAvatar());
+            item.setFromUserNickname(user.getNickName());
+
             item.setCreateTimeStr(RelativeDateFormat.format(item.getCreateTime()));
         });
         return page;

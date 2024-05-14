@@ -1,8 +1,8 @@
 package me.mcx.blog.service.web;
 
 import me.mcx.blog.domain.vo.message.ImMessageVO;
-import me.mcx.blog.domain.vo.user.ImOnlineUserVO;
 import me.mcx.common.core.web.domain.AjaxResult;
+import me.mcx.system.api.model.user.ImOnlineUserVO;
 
 import java.util.List;
 import java.util.Set;

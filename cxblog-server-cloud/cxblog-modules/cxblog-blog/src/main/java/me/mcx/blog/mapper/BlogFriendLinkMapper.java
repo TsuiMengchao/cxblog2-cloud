@@ -2,6 +2,8 @@ package me.mcx.blog.mapper;
 
 import java.util.List;
 import me.mcx.blog.domain.BlogFriendLink;
+import me.mcx.blog.domain.vo.friendLink.ApiFriendLinkVO;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 友情链接Mapper接口
@@ -58,4 +60,11 @@ public interface BlogFriendLinkMapper
      * @return 结果
      */
     public int deleteBlogFriendLinkByIds(Long[] ids);
+
+//    =======================================
+Integer getMaxSort();
+
+    void top(@Param("id") Integer id, @Param("sort") int sort);
+
+    List<ApiFriendLinkVO> selectLinkList(@Param("status") Integer status);
 }

@@ -64,7 +64,18 @@
       <el-table-column label="主键id" align="center" prop="id" />
       <el-table-column label="图片地址" align="center" prop="imgUrl" width="100">
         <template #default="scope">
-          <image-preview :src="scope.row.imgUrl" :width="50" :height="50"/>
+          <div>
+            <div style="display: flex;flex-wrap: wrap;">
+              <div
+                  v-for="(item, index) in splitImg(scope.row.imgUrl)"
+                  :key="index"
+                  style="display: flex;justify-content: center;margin: 2px 2px;"
+              >
+                <image-preview :src="item" :width="100" :height="100"/>
+              </div>
+            </div>
+          </div>
+
         </template>
       </el-table-column>
       <el-table-column label="内容" align="center" prop="content" />
@@ -87,7 +98,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -163,6 +174,15 @@ const data = reactive({
 });
 
 const { queryParams, form, rules } = toRefs(data);
+
+function splitImg(img) {
+  if(img==null) return
+  const imgs = img.split(',')
+  var r = imgs.filter(function(s) {
+    return s && s.trim()
+  })
+  return r
+}
 
 /** 查询说说列表 */
 function getList() {

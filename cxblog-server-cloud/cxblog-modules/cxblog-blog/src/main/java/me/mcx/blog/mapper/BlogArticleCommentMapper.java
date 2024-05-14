@@ -2,6 +2,10 @@ package me.mcx.blog.mapper;
 
 import java.util.List;
 import me.mcx.blog.domain.BlogArticleComment;
+import me.mcx.blog.domain.vo.article.ApiArticleListVO;
+import me.mcx.blog.domain.vo.message.ApiCommentListVO;
+import me.mcx.blog.domain.vo.message.SystemCommentVO;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 评论Mapper接口
@@ -60,4 +64,16 @@ public interface BlogArticleCommentMapper
     public int deleteBlogArticleCommentByIds(Long[] ids);
 
     Integer selectCount(BlogArticleComment blogArticleComment);
+
+//    ============================================
+List<SystemCommentVO> selectPageList(@Param("keywords")String keywords);
+
+    List<ApiCommentListVO> selectCommentPage(@Param("articleId") Long articleId);
+
+    /**
+     * 获取我的文章
+     * @param loginIdAsString 登录用户id
+     * @return
+     */
+    List<ApiArticleListVO> selectMyComment(@Param("userId") String loginIdAsString);
 }

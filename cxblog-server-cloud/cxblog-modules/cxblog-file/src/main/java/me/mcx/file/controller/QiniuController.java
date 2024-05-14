@@ -22,11 +22,9 @@ import me.mcx.common.core.web.domain.AjaxResult;
 import me.mcx.common.core.web.page.TableDataInfo;
 import me.mcx.file.domain.FileQiniuConfig;
 import me.mcx.file.domain.FileQiniuContent;
-import me.mcx.file.service.QiNiuConfigService;
-import me.mcx.file.service.QiniuContentService;
+import me.mcx.file.service.IFileQiNiuConfigService;
+import me.mcx.file.service.IFileQiniuContentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,7 +32,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -48,9 +45,9 @@ import java.util.Map;
 public class QiniuController extends BaseController {
 
     @Autowired
-    private QiniuContentService qiniuContentService;
+    private IFileQiniuContentService qiniuContentService;
     @Autowired
-    private QiNiuConfigService qiNiuConfigService;
+    private IFileQiNiuConfigService qiNiuConfigService;
 
     @GetMapping(value = "/config")
     public AjaxResult queryQiNiuConfig(){

@@ -17,7 +17,7 @@ import {
 
 import { getDataByDictType } from "@/api/system/dict/data";
 import { upload, delBatchFile } from "@/api/file";
-import {ElForm, ElMessage} from "element-plus";
+import {ElForm, ElMessage, ElMessageBox} from "element-plus";
 
 defineOptions({
   name: "Article",

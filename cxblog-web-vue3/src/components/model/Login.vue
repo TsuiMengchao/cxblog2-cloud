@@ -88,7 +88,7 @@
         </div>
       </div>
 
-      <!-- 注册 -->
+      <!-- 邮箱注册 -->
       <div v-if="index == 2">
         <el-form
           :model="form"
@@ -107,12 +107,12 @@
           <el-form-item
             label="昵称"
             :label-width="formLabelWidth"
-            prop="nickname"
+            prop="username"
           >
             <el-input
               class="input"
-              placeholder="请输入昵称"
-              v-model="form.nickname"
+              placeholder="请输入用户名（唯一ID）"
+              v-model="form.username"
               autocomplete="off"
             ></el-input>
           </el-form-item>
@@ -162,8 +162,89 @@
 
         <div class="goLoginBtn">
           已有账号，<a @click="handleChangeLoginMethod(1)" class="hand-style"
-            >去登录</a
+            >去登录</a>
+          <a @click="handleChangeLoginMethod(5)" class="hand-style" style="float: right"
+        >手机号注册</a>
+        </div>
+      </div>
+
+      <!-- 手机号注册 -->
+      <div v-if="index == 5">
+        <el-form
+            :model="form"
+            :rules="rules"
+            ref="formRef"
+            label-position="left"
+        >
+          <el-form-item label="手机号" :label-width="formLabelWidth" prop="phone">
+            <el-input
+                class="input"
+                placeholder="请输入手机号"
+                v-model="form.phone"
+                autocomplete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item
+              label="昵称"
+              :label-width="formLabelWidth"
+              prop="username"
           >
+            <el-input
+                class="input"
+                placeholder="请输入用户名（唯一ID）"
+                v-model="form.username"
+                autocomplete="off"
+            ></el-input>
+          </el-form-item>
+          <el-form-item
+              label="密码"
+              :label-width="formLabelWidth"
+              prop="password"
+          >
+            <el-input
+                class="input"
+                placeholder="请输入密码"
+                v-model="form.password"
+                autocomplete="off"
+                show-password
+            ></el-input>
+          </el-form-item>
+          <el-form-item
+              label="验证码"
+              :label-width="formLabelWidth"
+              prop="code"
+          >
+            <div style="display: flex">
+              <el-input
+                  class="input"
+                  placeholder="请输入验证码"
+                  v-model="form.code"
+                  autocomplete="off"
+              ></el-input>
+              <a
+                  v-if="showSendBtnFlag"
+                  class="send hand-style"
+                  @click="handleSendPhoneCode"
+              >发送</a
+              >
+              <a v-else class="send hand-style">{{ countdown }}s</a>
+            </div>
+          </el-form-item>
+        </el-form>
+
+        <el-button
+            type="danger"
+            class="loginBtn hand-style"
+            @click="register"
+            round
+        >注册</el-button
+        >
+
+        <div class="goLoginBtn">
+          已有账号，<a @click="handleChangeLoginMethod(1)" class="hand-style"
+        >去登录</a>
+          <a @click="handleChangeLoginMethod(2)" class="hand-style" style="float: right"
+          >邮箱注册</a>
         </div>
       </div>
 
@@ -295,11 +376,10 @@ const countdown = ref(60);
 const formRef = ref(null);
 const form = ref({
   username: null,
-  password: null,
+  password: null
 });
 const rules = {
   username: [{ required: true, message: "请输入账号", trigger: "blur" }],
-  nickname: [{ required: true, message: "请输入昵称", trigger: "blur" }],
   password: [{ required: true, message: "请输入密码", trigger: "blur" }],
   code: [{ required: true, message: "请输入验证码", trigger: "blur" }],
 };
@@ -330,9 +410,11 @@ function handleChangeLoginMethod(condition) {
     title.value = "邮箱注册";
   } else if (condition == 3) {
     title.value = "忘记密码";
-  } else {
+  } else if (condition == 4) {
     handleGetWecahtLoginCode();
     title.value = "微信扫码登录";
+  } else if (condition == 5) {
+    title.value = "手机号注册";
   }
   index.value = condition;
 }
@@ -354,6 +436,7 @@ function handleForgetPassword() {
 function register() {
   formRef.value.validate((valid) => {
     if (valid) {
+      form.value.nickname = "辰雪博客网页用户"
       emailRegister(form.value).then((res) => {
         proxy.$modal.msgSuccess("注册成功");
         index.value = 1;
@@ -384,6 +467,15 @@ function handleSendEmailCode() {
     }, 1000);
     proxy.$modal.msgSuccess("验证码发送成功");
   });
+}
+
+//发送手机号验证码
+function handleSendPhoneCode() {
+  if (!form.value.phone) {
+    proxy.$modal.msgWarning("请输入手机号");
+    return;
+  }
+  proxy.$modal.msgError("该功能尚未开发")
 }
 
 function close() {

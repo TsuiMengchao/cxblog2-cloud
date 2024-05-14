@@ -2,24 +2,23 @@ package me.mcx.blog.service.web.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import me.mcx.blog.domain.BlogArticle;
-import me.mcx.blog.domain.BlogArticleCollect;
-import me.mcx.blog.domain.BlogFollowed;
-import me.mcx.blog.domain.BlogUserUserinfo;
+import me.mcx.blog.domain.*;
 import me.mcx.blog.domain.dto.user.UserInfoDTO;
-import me.mcx.blog.domain.vo.user.UserInfoVO;
-import me.mcx.blog.mapper.BlogArticleCollectMapper;
-import me.mcx.blog.mapper.BlogArticleMapper;
-import me.mcx.blog.mapper.BlogFollowedMapper;
-import me.mcx.blog.mapper.BlogUserUserinfoMapper;
-import me.mcx.blog.mapper.web.UserInfoMapper;
-import me.mcx.blog.mapper.web.UserMapper;
+import me.mcx.blog.mapper.*;
 import me.mcx.blog.service.web.ApiUserService;
+import me.mcx.blog.util.BeanCopyUtil;
+import me.mcx.common.core.constant.Constants;
+import me.mcx.common.core.constant.SecurityConstants;
+import me.mcx.common.core.domain.R;
+import me.mcx.common.core.utils.StringUtils;
 import me.mcx.common.security.utils.SecurityUtils;
 import me.mcx.common.core.exception.ServiceException;
 import me.mcx.common.core.web.domain.AjaxResult;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
+import me.mcx.system.api.RemoteUserInfoService;
+import me.mcx.system.api.RemoteUserService;
+import me.mcx.system.api.domain.SysUserInfo;
+import me.mcx.system.api.model.user.UserInfoVO;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,15 +27,12 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ApiUserServiceImpl implements ApiUserService {
 
-    private final UserMapper userMapper;
-
-    private final BlogUserUserinfoMapper blogUserUserinfoMapper;
+    @Autowired
+    private RemoteUserInfoService remoteUserInfoService;
 
     private final BlogArticleMapper articleMapper;
 
     private final BlogArticleCollectMapper collectMapper;
-
-    private final UserInfoMapper userInfoMapper;
 
     private final BlogFollowedMapper followedMapper;
 
@@ -53,8 +49,8 @@ public class ApiUserServiceImpl implements ApiUserService {
     @Override
     public AjaxResult selectUserInfo(String userId) {
         userId = StringUtils.isNotBlank(userId) ? userId : SecurityUtils.getLoginIdAsString();
-        UserInfoVO userInfo = userInfoMapper.selectUserInfoByUserId(userId);
-        return AjaxResult.success(userInfo);
+        R<UserInfoVO> userInfo = remoteUserInfoService.selectUserInfoByUserId(userId, SecurityConstants.INNER);
+        return AjaxResult.success(userInfo.getData());
     }
 
     /**
@@ -66,14 +62,14 @@ public class ApiUserServiceImpl implements ApiUserService {
     @Override
     @Transactional(rollbackFor = Exception.class)
     public AjaxResult updateUser(UserInfoDTO vo) {
-        BlogUserUserinfo user = blogUserUserinfoMapper.selectBlogUserUserinfoByUserId(Long.valueOf(SecurityUtils.getLoginIdAsString()));
-        if (ObjectUtils.isEmpty(user)) {
-            throw  new ServiceException("用户不存在");
+        R<UserInfoVO> userInfoVo = remoteUserInfoService.getByUserId(SecurityUtils.getLoginIdAsString(), SecurityConstants.INNER);
+        if (StringUtils.isNull(userInfoVo) || StringUtils.isNull(userInfoVo.getData()))
+        {
+            throw new ServiceException("用户不存在");
         }
-//        BlogUserInfo userInfo = BeanCopyUtil.copyObject(vo, BlogUserInfo.class);
-//        userInfo.setId(user.getUserInfoId());
-//        userInfoMapper.updateById(userInfo);
-        return AjaxResult.success("修改信息成功");
+        SysUserInfo userInfo = BeanCopyUtil.copyObject(vo, SysUserInfo.class);
+        userInfo.setId(Long.valueOf(userInfoVo.getData().getUserInfoId()));
+        return remoteUserInfoService.updateUserInfo(userInfo, SecurityConstants.INNER);
     }
 
     /**
@@ -85,8 +81,8 @@ public class ApiUserServiceImpl implements ApiUserService {
     @Override
     public AjaxResult selectUserInfoByToken(String token) {
         Object userId = SecurityUtils.getUserId();
-        UserInfoVO userInfoVO = userMapper.selectInfoByUserIdNew(userId);
-        return AjaxResult.success(userInfoVO);
+        R<UserInfoVO> userInfoVO = remoteUserInfoService.selectInfoByUserIdNew(String.valueOf(userId), SecurityConstants.INNER);
+        return AjaxResult.success(userInfoVO.getData());
     }
 
     @Override

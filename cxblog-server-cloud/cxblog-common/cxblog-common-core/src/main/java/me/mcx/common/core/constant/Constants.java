@@ -83,6 +83,11 @@ public class Constants
     public static final String REGISTER = "Register";
 
     /**
+     * 邮件验证码
+     */
+    public static final String EMAIL_CODE = "EmailCode";
+
+    /**
      * 登录失败
      */
     public static final String LOGIN_FAIL = "Error";

@@ -2,6 +2,7 @@ package me.mcx.blog.mapper;
 
 import java.util.List;
 import me.mcx.blog.domain.BlogSign;
+import org.apache.ibatis.annotations.Param;
 
 /**
  * 签到Mapper接口
@@ -58,4 +59,28 @@ public interface BlogSignMapper
      * @return 结果
      */
     public int deleteBlogSignByIds(String[] ids);
+
+//    ===================================
+
+    /**
+     * 根据用户id和时间查询签到记录
+     * @param userId 用户id
+     * @param time 时间
+     * @return
+     */
+    BlogSign selctSignByUserIdAndTime(@Param("userId") String userId, @Param("time")String time);
+
+    /**
+     * 用户的签到记录
+     * @param startTime 开始时间
+     * @param endTime 结束时间
+     * @return
+     */
+    List<String> getSignRecordsByUserId(@Param("startTime") String startTime, @Param("endTime")String endTime, @Param("userId")String userId);
+
+    /**
+     * 验证用户当日是否签到
+     * @return
+     */
+    BlogSign validateTodayIsSign(@Param("time") String time, @Param("userId") String userId);
 }

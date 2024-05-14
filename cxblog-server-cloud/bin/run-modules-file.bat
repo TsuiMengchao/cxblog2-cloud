@@ -1,6 +1,6 @@
 @echo off
 echo.
-echo [��Ϣ] ʹ��Jar��������Modules-File���̡�
+echo [信息] 使用Jar命令运行Modules-File工程。
 echo.
 
 cd %~dp0

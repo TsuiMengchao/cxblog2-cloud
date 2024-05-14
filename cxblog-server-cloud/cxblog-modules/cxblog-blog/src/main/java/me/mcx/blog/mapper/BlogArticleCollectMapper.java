@@ -2,6 +2,7 @@ package me.mcx.blog.mapper;
 
 import java.util.List;
 import me.mcx.blog.domain.BlogArticleCollect;
+import me.mcx.blog.domain.vo.article.ApiArticleListVO;
 import org.apache.ibatis.annotations.Param;
 
 /**
@@ -61,4 +62,11 @@ public interface BlogArticleCollectMapper
     public int deleteBlogArticleCollectByIds(Long[] ids);
 
     Integer selectCount(BlogArticleCollect blogArticleCollect);
+
+//    ==================================
+    /**
+     * 我的收藏列表
+     * @return
+     */
+    List<ApiArticleListVO> selectCollectList(@Param("userId") String userId);
 }

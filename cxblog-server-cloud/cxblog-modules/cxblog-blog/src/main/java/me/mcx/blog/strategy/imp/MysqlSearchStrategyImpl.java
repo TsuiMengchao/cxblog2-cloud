@@ -4,7 +4,7 @@ package me.mcx.blog.strategy.imp;
 import lombok.RequiredArgsConstructor;
 import me.mcx.blog.common.Constants;
 import me.mcx.blog.domain.vo.article.ApiArticleSearchVO;
-import me.mcx.blog.mapper.web.ArticleMapper;
+import me.mcx.blog.mapper.BlogArticleMapper;
 import me.mcx.blog.strategy.SearchStrategy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor(onConstructor = @__(@Autowired))
 public class MysqlSearchStrategyImpl implements SearchStrategy {
 
-    private final ArticleMapper articleMapper;
+    private final BlogArticleMapper articleMapper;
 
     @Override
     public List<ApiArticleSearchVO> searchArticle(String keywords){

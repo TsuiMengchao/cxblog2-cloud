@@ -95,4 +95,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
+<!--    ===================================-->
+    <select id="selectPublicSayList" resultType="me.mcx.blog.domain.vo.say.ApiSayVO">
+        select id, user_id as userId, content, address, is_public, create_time as createTime from blog_say s
+        <if test="!showPrivate">
+            where s.is_public = 1
+        </if>
+        order by s.create_time desc
+    </select>
 </mapper>

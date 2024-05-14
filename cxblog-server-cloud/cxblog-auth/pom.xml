@@ -4,7 +4,7 @@
     <parent>
         <groupId>me.mcx</groupId>
         <artifactId>cxblog</artifactId>
-        <version>3.6.4</version>
+        <version>2.0.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     
@@ -50,6 +50,21 @@
         <dependency>
             <groupId>me.mcx</groupId>
             <artifactId>cxblog-common-security</artifactId>
+        </dependency>
+
+        <!-- 邮件接口 -->
+        <dependency>
+            <groupId>me.mcx</groupId>
+            <artifactId>cxblog-api-msg</artifactId>
+            <version>${cxblog.version}</version>
+        </dependency>
+
+        <!--lombok插件-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <optional>true</optional>
+            <version>edge-SNAPSHOT</version> <!--这个版本是关键--> <!--Lombok和Java21不兼容专门加入-->
         </dependency>
         
     </dependencies>

@@ -96,7 +96,7 @@
 //             // FormData 对象
 //             var formData = new FormData()
 //             // 文件对象
-//             formData.append('multipartFile', this.files)
+//             formData.append('file', this.files)
 //
 //           formData.append("path", "file.img.upload.say")
 //             upload(formData).then(res => {

@@ -1,6 +1,6 @@
 @echo off
 echo.
-echo [��Ϣ] ʹ��Jar��������Auth���̡�
+echo [信息] 使用Jar命令运行Auth工程。
 echo.
 
 cd %~dp0

@@ -1,6 +1,8 @@
 package me.mcx.system.mapper;
 
 import java.util.List;
+
+import me.mcx.system.api.model.user.UserInfoVO;
 import org.apache.ibatis.annotations.Param;
 import me.mcx.system.api.domain.SysUser;
 

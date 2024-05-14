@@ -7,11 +7,14 @@ import java.util.Date;
 import java.util.List;
 
 import cn.hutool.core.util.ObjectUtil;
+import lombok.extern.slf4j.Slf4j;
 import me.mcx.common.core.exception.ServiceException;
 import me.mcx.common.core.utils.DateUtils;
 import me.mcx.common.core.utils.StringUtils;
 import me.mcx.common.core.utils.file.FileUtils;
 import me.mcx.file.config.FileProperties;
+import me.mcx.file.domain.FileLocalConfig;
+import me.mcx.file.mapper.FileLocalConfigMapper;
 import me.mcx.file.utils.FileUploadUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,10 +32,14 @@ import org.springframework.web.multipart.MultipartFile;
  * @date 2024-05-08
  */
 @Service
+@Slf4j
 public class FileLocalContentServiceImpl implements IFileLocalContentService 
 {
     @Autowired
     private FileLocalContentMapper fileLocalContentMapper;
+
+    @Autowired
+    private FileLocalConfigMapper configMapper;
 
     @Autowired
     private FileProperties properties;
@@ -40,13 +47,11 @@ public class FileLocalContentServiceImpl implements IFileLocalContentService
     /**
      * 资源映射路径 前缀
      */
-    @Value("${local.prefix}")
     public String localFilePrefix;
 
     /**
      * 域名或本机访问地址
      */
-    @Value("${local.domain}")
     public String domain;
 
     /**
@@ -78,12 +83,20 @@ public class FileLocalContentServiceImpl implements IFileLocalContentService
     @Transactional(rollbackFor = Exception.class)
     public FileLocalContent create(String name, MultipartFile multipartFile)
     {
+       FileLocalConfig config = configMapper.selectFileLocalConfigByConfigId(1L);
+        if(config == null){
+            throw new ServiceException("请先添加相应配置，再操作");
+        }
+        domain = config.getDomain();
+        localFilePrefix = config.getPrefix();
+
         FileUtils.checkSize(properties.getMaxSize(), multipartFile.getSize());
         String suffix = FileUtils.getExtensionName(multipartFile.getOriginalFilename());
         String type = FileUtils.getFileType(suffix);
         String filename = null;
         try {
-            filename = FileUploadUtils.upload(properties.getPath().getPath() + type +  File.separator, multipartFile);
+            filename = FileUploadUtils.upload(properties.getPath().getPath() +  File.separator, multipartFile);
+            log.info(properties.getPath().getPath() +  File.separator);
         } catch (IOException e) {
             throw new ServiceException("上传失败");
         }

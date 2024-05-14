@@ -86,4 +86,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             <if test="articleId != null "> and article_id = #{articleId}</if>
         </where>
     </select>
+
+<!--    ==============================-->
+    <select id="selectCollectList" resultType="me.mcx.blog.domain.vo.article.ApiArticleListVO">
+        select c.create_time,a.*, b.NAME AS categoryName,
+               b.id AS categoryId from blog_article a
+                                           left join blog_article_collect c on c.article_id = a.id
+                                           left JOIN blog_category b ON a.category_id = b.id
+        where c.user_id = #{userId} order by c.create_time desc
+    </select>
 </mapper>

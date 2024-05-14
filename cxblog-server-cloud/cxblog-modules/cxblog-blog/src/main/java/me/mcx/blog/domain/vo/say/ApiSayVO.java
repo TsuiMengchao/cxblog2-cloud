@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import me.mcx.blog.domain.vo.user.UserInfoVO;
+import me.mcx.system.api.model.user.UserInfoVO;
 
 import java.util.Date;
 import java.util.List;

@@ -21,4 +21,9 @@ public class ServiceNameConstants
      * 文件服务的serviceid
      */
     public static final String FILE_SERVICE = "cxblog-file";
+
+    /**
+     * 通讯服务的serviceid
+     */
+    public static final String MSG_SERVICE = "cxblog-msg";
 }

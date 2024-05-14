@@ -18,9 +18,13 @@ public class FileLocalConfig extends BaseEntity
     /** ID */
     private Long configId;
 
-    /** 外链域名 */
-    @Excel(name = "外链域名")
-    private String localFileUrl;
+    /** 资源映射路径 */
+    @Excel(name = "资源映射路径")
+    private String domain;
+
+    /** 资源映射路径前缀 */
+    @Excel(name = "资源映射路径前缀")
+    private String prefix;
 
     public void setConfigId(Long configId) 
     {
@@ -31,21 +35,32 @@ public class FileLocalConfig extends BaseEntity
     {
         return configId;
     }
-    public void setLocalFileUrl(String localFileUrl) 
+    public void setDomain(String domain)
     {
-        this.localFileUrl = localFileUrl;
+        this.domain = domain;
     }
 
-    public String getLocalFileUrl() 
+    public String getDomain()
     {
-        return localFileUrl;
+        return domain;
+    }
+
+    public void setPrefix(String prefix)
+    {
+        this.prefix = prefix;
+    }
+
+    public String getPrefix()
+    {
+        return prefix;
     }
 
     @Override
     public String toString() {
         return new ToStringBuilder(this,ToStringStyle.MULTI_LINE_STYLE)
             .append("configId", getConfigId())
-            .append("localFileUrl", getLocalFileUrl())
+            .append("domain", getDomain())
+                .append("prefix", getPrefix())
             .toString();
     }
 }

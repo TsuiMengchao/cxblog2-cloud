@@ -1,9 +1,8 @@
 package me.mcx.blog.controller.web;
 
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
-import me.mcx.blog.annotation.AccessLimit;
+import me.mcx.common.security.annotation.AccessLimit;
 import me.mcx.blog.service.web.ApiSignService;
 import me.mcx.common.core.web.domain.AjaxResult;
 import org.springframework.web.bind.annotation.GetMapping;

@@ -1,6 +1,6 @@
 package me.mcx.blog.service.web.impl;
 
-import me.mcx.blog.mapper.web.TagsMapper;
+import me.mcx.blog.mapper.BlogTagsMapper;
 import me.mcx.blog.service.web.ApiTagService;
 import me.mcx.blog.domain.vo.tag.ApiTagListVO;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +15,7 @@ import java.util.List;
 public class ApiTagServiceImpl implements ApiTagService {
 
     @Autowired
-    private final TagsMapper tagsMapper;
+    private final BlogTagsMapper tagsMapper;
 
     /**
      *  标签列表

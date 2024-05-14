@@ -108,4 +108,16 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
+<!--    ============================================-->
+    <select id="getMaxSort" resultType="java.lang.Integer">
+        select max(sort) from blog_friend_link
+    </select>
+    <update id="top">
+        update blog_friend_link set sort=#{sort} where id=#{id}
+    </update>
+
+    <select id="selectLinkList" resultType="me.mcx.blog.domain.vo.friendLink.ApiFriendLinkVO">
+        select name,avatar,url,info,sort from blog_friend_link where status=#{status} order by sort desc
+    </select>
 </mapper>

@@ -15,7 +15,7 @@ import me.mcx.common.log.annotation.Log;
 import me.mcx.common.log.enums.BusinessType;
 import me.mcx.common.security.annotation.RequiresPermissions;
 import me.mcx.blog.domain.BlogFollowed;
-import me.mcx.blog.service.IBlogFollowedService;
+import me.mcx.blog.service.admin.IBlogFollowedService;
 import me.mcx.common.core.web.controller.BaseController;
 import me.mcx.common.core.web.domain.AjaxResult;
 import me.mcx.common.core.utils.poi.ExcelUtil;

@@ -37,6 +37,9 @@ export default defineConfig(({ mode, command }) => {
         }
       }
     },
+    build: {
+      outDir: 'admin', // 指定输出路径
+    },
     //fix:error:stdin>:7356:1: warning: "@charset" must be the first rule in the file
     css: {
       postcss: {

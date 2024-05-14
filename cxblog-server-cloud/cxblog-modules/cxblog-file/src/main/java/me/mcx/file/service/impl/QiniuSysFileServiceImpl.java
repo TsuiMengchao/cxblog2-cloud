@@ -56,6 +56,7 @@ public class QiniuSysFileServiceImpl implements ISysFileService
     @Override
     public String uploadFile(MultipartFile file, String path) throws Exception
     {
+        if (!path.isEmpty()) path = path.replace(".", "/");
         FileQiniuConfig qiniuConfig = qiniuConfigMapper.selectFileQiniuConfigByConfigId(1L);
         FileUtils.checkSize(maxSize, file.getSize());
         if(qiniuConfig.getConfigId() == null){
@@ -72,7 +73,7 @@ public class QiniuSysFileServiceImpl implements ISysFileService
             if(qiniuContentMapper.selectFileQiniuContentList(new FileQiniuContent() {{setName(finalKey);}}).size() != 0) {
                 key = QiNiuUtil.getKey(key);
             }
-            Response response = uploadManager.put(file.getBytes(), key, upToken);
+            Response response = uploadManager.put(file.getBytes(), path + "/" + key, upToken);
             //解析上传成功的结果
             DefaultPutRet putRet = JSON.parseObject(response.bodyString(), DefaultPutRet.class);
 

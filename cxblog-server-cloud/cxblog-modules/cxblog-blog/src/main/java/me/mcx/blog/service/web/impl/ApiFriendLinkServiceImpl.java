@@ -1,11 +1,9 @@
 package me.mcx.blog.service.web.impl;
 
-import cn.hutool.core.thread.ThreadUtil;
 import lombok.RequiredArgsConstructor;
 import me.mcx.blog.domain.BlogFriendLink;
 import me.mcx.blog.domain.vo.friendLink.ApiFriendLinkVO;
 import me.mcx.blog.mapper.BlogFriendLinkMapper;
-import me.mcx.blog.mapper.web.FriendLinkMapper;
 import me.mcx.blog.service.web.ApiFriendLinkService;
 import me.mcx.common.core.exception.ServiceException;
 import me.mcx.common.core.web.domain.AjaxResult;
@@ -23,7 +21,7 @@ public class ApiFriendLinkServiceImpl implements ApiFriendLinkService {
 
     private final BlogFriendLinkMapper blogFriendLinkMapper;
 
-    private final FriendLinkMapper friendLinkMapper;
+    private final BlogFriendLinkMapper friendLinkMapper;
 
 //    private final EmailService emailService;
 

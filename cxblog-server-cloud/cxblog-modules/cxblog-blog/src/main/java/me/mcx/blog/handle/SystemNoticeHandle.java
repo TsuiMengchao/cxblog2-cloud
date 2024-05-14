@@ -4,7 +4,6 @@ import cn.hutool.extra.spring.SpringUtil;
 import lombok.extern.slf4j.Slf4j;
 import me.mcx.blog.domain.BlogImMessage;
 import me.mcx.blog.mapper.BlogImMessageMapper;
-import me.mcx.blog.mapper.web.ImMessageMapper;
 import me.mcx.common.security.utils.SecurityUtils;
 import me.mcx.common.core.utils.ip.IpUtils;
 

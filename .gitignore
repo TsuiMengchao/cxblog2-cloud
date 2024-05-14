@@ -1,5 +1,11 @@
 files/file/*
 environment
+docker/**/*.jar
+docker/mysql/**/*.sql
+docker/mysql/data
+docker/nginx/html
+docker/redis/data
+**/logs
 
 # Editor directories and files
 .git

@@ -1,7 +1,7 @@
 package me.mcx.blog.service.web.impl;
 
 
-import me.mcx.blog.mapper.web.CategoryMapper;
+import me.mcx.blog.mapper.BlogCategoryMapper;
 import me.mcx.blog.service.web.ApiCategoryService;
 import me.mcx.blog.domain.vo.category.ApiCategoryListVO;
 import me.mcx.common.core.web.domain.AjaxResult;
@@ -14,7 +14,7 @@ import java.util.List;
 public class ApiCategoryServiceImpl implements ApiCategoryService {
 
     @Autowired
-    private CategoryMapper categoryMapper;
+    private BlogCategoryMapper categoryMapper;
 
     /**
      * 首页分类列表

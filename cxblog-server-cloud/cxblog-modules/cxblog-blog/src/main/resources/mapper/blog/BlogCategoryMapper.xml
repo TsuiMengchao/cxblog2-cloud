@@ -88,4 +88,38 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             #{id}
         </foreach>
     </delete>
+
+<!--    ======================================-->
+    <select id="countArticle" resultType="me.mcx.blog.domain.vo.category.SystemCategoryCountVO">
+        select a.name, count(b.id) as value
+        from blog_category a left join blog_article b
+        on a.id=b.category_id
+        GROUP BY a.id
+    </select>
+
+    <select id="selectCategory" resultType="me.mcx.blog.domain.vo.category.SystemCategoryListVO">
+        select a.id,a.name,a.sort,a.create_time,a.click_volume,a.icon,b.articleCount from blog_category a
+        left join (select category_id,count(id) as articleCount from blog_article group by category_id) b on
+        a.id=b.category_id
+        <where>
+            <if test="name != null">
+                a.name like concat('%',#{name},'%')
+            </if>
+        </where>
+    </select>
+    <select id="selectCategoryListApi" resultType="me.mcx.blog.domain.vo.category.ApiCategoryListVO">
+        SELECT
+            c.id,
+            c.name,
+            c.icon,
+            count( a.id ) AS articleNum
+        FROM
+            blog_category c
+                LEFT JOIN blog_article a ON c.id = a.category_id
+        GROUP BY
+            c.id
+        ORDER BY
+            c.sort
+                desc
+    </select>
 </mapper>

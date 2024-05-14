@@ -5,17 +5,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
+
+import me.mcx.system.api.domain.SysUserInfo;
+import me.mcx.system.api.model.user.UserVO;
+import me.mcx.system.service.*;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import me.mcx.common.core.domain.R;
 import me.mcx.common.core.utils.StringUtils;
@@ -32,12 +29,6 @@ import me.mcx.system.api.domain.SysDept;
 import me.mcx.system.api.domain.SysRole;
 import me.mcx.system.api.domain.SysUser;
 import me.mcx.system.api.model.LoginUser;
-import me.mcx.system.service.ISysConfigService;
-import me.mcx.system.service.ISysDeptService;
-import me.mcx.system.service.ISysPermissionService;
-import me.mcx.system.service.ISysPostService;
-import me.mcx.system.service.ISysRoleService;
-import me.mcx.system.service.ISysUserService;
 
 /**
  * 用户信息
@@ -50,6 +41,9 @@ public class SysUserController extends BaseController
 {
     @Autowired
     private ISysUserService userService;
+
+    @Autowired
+    private ISysUserInfoService userInfoService;
 
     @Autowired
     private ISysRoleService roleService;
@@ -131,6 +125,31 @@ public class SysUserController extends BaseController
     }
 
     /**
+     * 获取当前用户信息
+     */
+    @InnerAuth
+    @GetMapping("/getUserVO")
+    public R<UserVO> getUserVO(@RequestParam("userId") Long userId)
+    {
+        SysUser sysUser = userService.selectUserById(userId);
+        if (StringUtils.isNull(sysUser))
+        {
+            return R.fail("用户名或密码错误");
+        }
+
+        UserVO userVo = new UserVO() {{
+            setUserId(sysUser.getUserId());
+            setUserName(sysUser.getUserName());
+            setNickName(sysUser.getNickName());
+            setEmail(sysUser.getEmail());
+            setPhonenumber(sysUser.getPhonenumber());
+            setSex(sysUser.getSex());
+            setAvatar(sysUser.getAvatar());
+        }};
+        return R.ok(userVo);
+    }
+
+    /**
      * 注册用户信息
      */
     @InnerAuth
@@ -146,7 +165,14 @@ public class SysUserController extends BaseController
         {
             return R.fail("保存用户'" + username + "'失败，注册账号已存在");
         }
-        return R.ok(userService.registerUser(sysUser));
+        if (userService.registerUser(sysUser)) {
+            SysUser user = userService.selectUserByUserName(sysUser.getUserName());
+            SysUserInfo userInfo = new SysUserInfo() {{
+                setUserId(user.getUserId());
+            }};
+            userInfoService.insertSysUserInfo(userInfo);
+        }
+        return R.ok();
     }
 
     /**

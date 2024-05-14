@@ -2,7 +2,7 @@ package me.mcx.blog.im;
 
 public class WebSocketConstant {
 
-    public static final int WEB_SOCKET_PORT = 8801;
+    public static final int WEB_SOCKET_PORT = 8199;
 
     public static final String WEB_SOCKET_IP = "127.0.0.1";
 

@@ -31,6 +31,9 @@ export default defineConfig(({ command, mode }) => {
         },
       },
     },
+    build: {
+      outDir: 'web', // 指定输出路径
+    },
     plugins: [
       vue(),
       svgBuilder("./src/icons/svg/"),

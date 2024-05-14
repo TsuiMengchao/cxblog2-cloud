@@ -2,6 +2,11 @@ package me.mcx.blog.mapper;
 
 import java.util.List;
 import me.mcx.blog.domain.BlogCategory;
+import me.mcx.blog.domain.vo.category.ApiCategoryListVO;
+import me.mcx.blog.domain.vo.category.SystemCategoryCountVO;
+import me.mcx.blog.domain.vo.category.SystemCategoryListVO;
+import org.apache.ibatis.annotations.Param;
+import org.springframework.data.domain.Page;
 
 /**
  * 博客分类Mapper接口
@@ -58,4 +63,21 @@ public interface BlogCategoryMapper
      * @return 结果
      */
     public int deleteBlogCategoryByIds(Long[] ids);
+
+//    ===========================================
+    /**
+     * 分页获取分类
+     * @param objectPage 分页对象
+     * @param name 分类名
+     * @return
+     */
+    Page<SystemCategoryListVO> selectCategory(@Param("page")Page<BlogCategory> objectPage, @Param("name")String name);
+
+    /**
+     * 统计分类
+     * @return
+     */
+    List<SystemCategoryCountVO> countArticle();
+
+    List<ApiCategoryListVO> selectCategoryListApi();
 }

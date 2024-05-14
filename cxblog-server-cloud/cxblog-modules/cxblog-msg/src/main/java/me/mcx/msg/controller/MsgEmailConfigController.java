@@ -50,7 +50,6 @@ public class MsgEmailConfigController extends BaseController
     /**
      * 发送邮箱
      */
-    @RequiresPermissions("msg:emailConfig:add")
     @Log(title = "邮箱配置", businessType = BusinessType.INSERT)
     @PostMapping
     public AjaxResult send(@Validated @RequestBody MsgEmailVo emailVo)

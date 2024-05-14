@@ -56,7 +56,17 @@
       <el-table-column label="关联网页信息" align="center" prop="site" />
       <el-table-column label="关联图片地址" align="center" prop="imgUrl" width="100">
         <template #default="scope">
+          <div>
+            <div style="display: flex;flex-wrap: wrap;">
+              <div
+                  v-for="(item, index) in splitImg(scope.row.imgUrl)"
+                  :key="index"
+                  style="display: flex;justify-content: center;margin: 2px 2px;"
+              >
           <image-preview :src="scope.row.imgUrl" :width="50" :height="50"/>
+              </div>
+            </div>
+          </div>
         </template>
       </el-table-column>
       <el-table-column label="操作" align="center" class-name="small-padding fixed-width">
@@ -66,7 +76,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -124,6 +134,15 @@ const data = reactive({
 });
 
 const { queryParams, form, rules } = toRefs(data);
+
+function splitImg(img) {
+  if(img==null) return
+  const imgs = img.split(',')
+  var r = imgs.filter(function(s) {
+    return s && s.trim()
+  })
+  return r
+}
 
 /** 查询论坛列表 */
 function getList() {
